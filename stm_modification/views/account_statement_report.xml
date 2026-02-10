@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_account_statement" model="ir.actions.report">
+        <field name="name">Account Statement</field>
+        <field name="model">account.statement.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">stm_modification.statement_report_template</field>
+        <field name="report_file">stm_modification.statement_report_template</field>
+        <field name="print_report_name">'Statement - %s' % (object.partner_id.name)</field>
+        <field name="binding_model_id" ref="model_account_statement_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="sequence_account_statement" model="ir.sequence">
+        <field name="name">Account Statement Sequence</field>
+        <field name="code">account.statement.report</field>
+        <field name="prefix">ST</field>
+        <field name="padding">3</field>
+        <field name="number_increment">1</field>
+        <field name="implementation">standard</field>
+    </record>
+</odoo>

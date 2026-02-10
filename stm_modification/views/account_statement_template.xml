@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="statement_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <!--                <t t-set="o" t-value="o.with_context(lang='en_US')"/>-->
+
+                <div class="page" style="font-size:12px;">
+
+                    <!-- HEADER -->
+                    <table style="width:100%; margin-bottom:15px;">
+                        <tr>
+                            <td style="width:70%;">
+                                <t t-if="company.logo">
+                                    <img t-att-src="image_data_uri(company.logo)"
+                                         style="max-height:100px;"/>
+                                </t>
+                                <br/>
+                                <div>
+                                    <strong>
+                                        <span t-field="company.name"/>
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span t-field="company.street"/>
+                                </div>
+                                <div>
+                                    <span t-field="company.city"/>
+                                </div>
+                                <div>
+                                    <strong>Phone:</strong>
+                                    <span t-field="company.phone"/>
+                                </div>
+                                <!-- CUSTOMER -->
+                                <h3>Customer Information</h3>
+                                <div>
+                                    <strong>Name:</strong>
+                                    <span t-field="o.name"/>
+                                </div>
+                                <div>
+                                    <strong>Address:</strong>
+                                    <span t-field="o.street"/>
+                                </div>
+                                <div>
+                                    <strong>Phone:</strong>
+                                    <span t-field="o.phone"/>
+                                </div>
+                                <div>
+                                    <strong>Email:</strong>
+                                    <span t-field="o.email"/>
+                                </div>
+                            </td>
+
+                            <td style="width:30%;">
+                                <h2 style="margin-bottom:5px;">Account Statement</h2>
+                                <div>
+                                    <strong>Date:</strong>
+                                    <span t-esc="statement_date"/>
+                                </div>
+                                <!-- UNIT -->
+                                <h3 style="margin-top:5px; margin-bottom:5px;">Unit Information</h3>
+                                <t t-if="unit_product">
+                                    <div>
+                                        <strong>Unit Name:</strong>
+                                        <span t-field="unit_product.name"/>
+                                    </div>
+                                    <div>
+                                        <strong>Unit Category:</strong>
+                                        <span t-field="unit_product.categ_id"/>
+                                    </div>
+                                    <div>
+                                        <strong>Unit Type:</strong>
+                                        <span t-field="unit_product.project_type"/>
+                                    </div>
+                                    <div>
+                                        <strong>Project:</strong>
+                                        <span t-field="unit_product.project_location"/>
+                                    </div>
+                                    <div>
+                                        <strong>Unit Amount:</strong>
+                                        <span t-esc="unit_amount"/>
+                                    </div>
+                                </t>
+                                <br/>
+                                <!-- PAYMENTS -->
+                                <div>
+                                    <strong>Collected Amount:</strong>
+                                    <span t-esc="collected_amount"/>
+                                </div>
+                                <div>
+                                    <strong>Outstanding Amount:</strong>
+                                    <span t-esc="outstanding_amount"/>
+                                </div>
+                                <div>
+                                    <strong>Total No of Cheques:</strong>
+                                    <span t-esc="total_cheques"/>
+                                </div>
+                                <div>
+                                    <strong>Collected:</strong>
+                                    <span t-esc="cheques_collected"/>
+                                </div>
+                                <div>
+                                    <strong>Rejected:</strong>
+                                    <span t-esc="cheques_rejected"/>
+                                </div>
+                                <div>
+                                    <strong>Remaining:</strong>
+                                    <span t-esc="cheques_remaining"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- INSTALLMENT & CHEQUE DETAILS -->
+                    <h2 style="margin-top:15px; text-align:center;">Installment and cheque details</h2>
+                    <table border="1" width="100%" cellspacing="0" cellpadding="5" style="border-collapse: collapse;">
+                        <thead>
+                            <tr style="background:#f0f0f0; text-align:center;">
+                                <th>Payment Date</th>
+                                <th>Name</th>
+                                <th>Payment Journal</th>
+                                <th>Partner</th>
+                                <th>Payment Amount</th>
+                                <th>Due Date</th>
+                                <th>Installment No.</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="installment_lines" t-as="l">
+                                <tr>
+                                    <td>
+                                        <span t-esc="l.payment_date.strftime('%d/%m/%Y') if l.payment_date else ''"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="l.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="l.journal_id.with_context(lang='en_US').name"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="l.partner_id"/>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <span t-field="l.payment_amount"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="l.due_date.strftime('%d/%m/%Y') if l.due_date else ''"/>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span t-esc="l.installment_no"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="l.state"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="product_category_form_view_add_location" model="ir.ui.view">
+            <field name="name">product.category.form.add.location</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Add field at the end of the sheet -->
+                <xpath expr="//sheet" position="inside">
+                    <separator string="STM Information"/>
+                    <group>
+                        <field name="location_address" placeholder="Location address..."/>
+                    </group>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

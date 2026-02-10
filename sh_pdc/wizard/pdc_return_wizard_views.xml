@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- PDC Return Wizard Form -->
+    <record id="pdc_return_wizard_form" model="ir.ui.view">
+        <field name="name">pdc.return.wizard.form</field>
+        <field name="model">pdc.return.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Return Check">
+                <sheet>
+                    <group>
+                        <field name="pdc_id" invisible="1"/>
+                        <field name="action_type" widget="radio" required="1"/>
+                    </group>
+                    
+                    <group>
+                        <!-- Reason field - ONLY visible when Reject is selected -->
+                        <field name="reject_reason" 
+                               string="Reason"
+                               placeholder="Enter rejection reason (required - e.g., Insufficient funds, Signature mismatch, Invalid date...)"
+                               invisible="action_type != 'reject'"
+                               required="action_type == 'reject'"
+                               nolabel="0"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_save" string="Save" type="object" class="btn-primary"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
