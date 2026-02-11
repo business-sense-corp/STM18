@@ -14,8 +14,19 @@
     <template id="report_invoice_custom">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
+                <t t-set="o" t-value="o.with_context(lang='en_US')"/>
                 <div class="page">
                     <style>
+                        @font-face {
+                        font-family: 'Amiri';
+                        src: url('/stm_modification/static/src/fonts/Amiri-Regular.ttf') format('truetype');
+                        }
+
+                        body, .page {
+                        padding-top: 0px !important;
+                        margin-top: 0px !important;
+                        font-family: Arial, Helvetica, sans-serif;
+                        }
                         .invoice-title {
                         font-size: 36px;
                         font-weight: bold;
@@ -74,11 +85,6 @@
                         margin-top: 30px;
                         }
 
-                        .page {
-                        padding-top: 0px !important;
-                        margin-top: 0px !important;
-                        }
-
                         .header-block {
                         margin-bottom: 15px;
                         }
@@ -102,6 +108,12 @@
                         width: 120px;
                         color: #444;
                         }
+                        .arabic-text {
+                        font-family: 'Amiri', 'Arial', 'Tahoma', sans-serif !important;
+                        unicode-bidi: plaintext !important;
+                        text-align: right !important;
+                        }
+
                     </style>
 
                     <table style="width:100%; margin-top:0;">
@@ -115,43 +127,43 @@
                                 <br/>
 
                                 <strong style="margin-bottom:5px;">
-                                    <span t-field="o.company_id.name"/>
+                                    <span t-out="o.company_id.name"/>
                                 </strong>
                                 <br/>
-                                <span t-field="o.company_id.street"/>
+                                <span class="arabic-text" t-out="o.company_id.street"/>
                                 <br style="margin-bottom:5px;"/>
-                                <span t-field="o.company_id.street2"/>
-                                <span t-field="o.company_id.city"/>
+                                <span t-out="o.company_id.street2"/>
+                                <span t-out="o.company_id.city"/>
                                 <t t-if="o.company_id.state_id">,
-                                    <span t-field="o.company_id.state_id"/>
+                                    <span t-out="o.company_id.state_id.name"/>
                                 </t>
                                 <t t-if="o.company_id.zip">
-                                    <span t-field="o.company_id.zip"/>
+                                    <span t-out="o.company_id.zip"/>
                                 </t>
                                 <br style="margin-bottom:5px;"/>
                                 <t t-if="o.company_id.phone">
                                     <strong>Phone:</strong>
-                                    <span t-field="o.company_id.phone"/>
+                                    <span t-out="o.company_id.phone"/>
                                 </t>
 
                                 <h3>Customer Information</h3>
                                 <div style="margin-bottom:5px;">
                                     <strong>Name</strong>
-                                    <span t-field="o.partner_id"/>
+                                    <span t-out="o.partner_id.name"/>
                                 </div>
                                 <div style="margin-bottom:5px;">
                                     <strong style="margin-bottom:5px;">Address</strong>
-                                    <span t-field="o.partner_id.street"/>
-                                    <span t-field="o.partner_id.street2"/>
+                                    <span t-out="o.partner_id.street"/>
+                                    <span t-out="o.partner_id.street2"/>
                                     <br style="margin-bottom:5px;"/>
-                                    <span t-field="o.partner_id.city"/>
-                                    <span t-field="o.partner_id.state_id"/>
+                                    <span t-out="o.partner_id.city"/>
+                                    <span t-out="o.partner_id.state_id.name"/>
                                 </div>
                                 <div style="margin-bottom:5px;">
                                     <strong>Phone Number</strong>
-                                    <span t-field="o.partner_id.phone"/>
-<!--                                    <span> / </span>-->
-<!--                                    <span t-field="o.partner_id.mobile"/>-->
+                                    <span t-out="o.partner_id.phone"/>
+                                    <!--                                    <span> / </span>-->
+                                    <!--                                    <span t-field="o.partner_id.mobile"/>-->
                                 </div>
                                 <div style="margin-bottom:5px;">
                                     <strong>Email</strong>
@@ -170,7 +182,7 @@
                                 </div>
                                 <div>
                                     <strong style="margin-bottom:5px;">
-                                        <span t-field="o.invoice_date"/>
+                                        <span t-out="o.invoice_date"/>
                                     </strong>
                                 </div>
 
@@ -183,19 +195,19 @@
                                 <h3>Unit Information</h3>
                                 <div style="margin-bottom:5px;">
                                     <strong>Unit Name</strong>
-                                    <span t-field="o.invoice_line_ids[0].product_id"/>
+                                    <span t-out="o.invoice_line_ids[0].product_id.name"/>
                                 </div>
                                 <div style="margin-bottom:5px;">
                                     <strong>Unit Category</strong>
-                                    <span t-field="o.invoice_line_ids[0].product_uom_category_id"/>
+                                    <span t-out="o.invoice_line_ids[0].product_uom_category_id.name"/>
                                 </div>
                                 <div style="margin-bottom:5px;">
                                     <strong>Unit Type</strong>
-                                    <span t-field="o.invoice_line_ids[0].product_id.project_type"/>
+                                    <span t-out="o.invoice_line_ids[0].product_id.project_type"/>
                                 </div>
                                 <div style="margin-bottom:5px;">
                                     <strong>Project</strong>
-                                    <span t-field="o.invoice_line_ids[0].product_id.project_location"/>
+                                    <span t-out="o.invoice_line_ids[0].product_id.project_location"/>
                                 </div>
                             </td>
                         </tr>
@@ -214,16 +226,16 @@
                             <t t-foreach="o.invoice_line_ids" t-as="line">
                                 <tr>
                                     <td>
-                                        <span t-field="line.name"/>
+                                        <span t-out="line.name"/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-field="line.quantity"/>
+                                        <span t-out="line.quantity"/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-field="line.price_unit"/>
+                                        <span t-out="line.price_unit"/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-field="line.price_subtotal"/>
+                                        <span t-out="line.price_subtotal"/>
                                     </td>
                                 </tr>
                             </t>
@@ -235,7 +247,7 @@
                             <tr>
                                 <td style="font-weight: bold; font-size: 16px;">TOTAL</td>
                                 <td style="font-weight: bold; font-size: 16px; text-align: right;">
-                                    <span t-field="o.amount_total"/>
+                                    <span t-out="o.amount_total"/>
                                 </td>
                             </tr>
                         </table>

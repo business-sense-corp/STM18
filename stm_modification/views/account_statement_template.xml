@@ -4,8 +4,7 @@
     <template id="statement_report_template">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <!--                <t t-set="o" t-value="o.with_context(lang='en_US')"/>-->
-
+                <t t-set="o" t-value="o.with_context(lang='en_US')"/>
                 <div class="page" style="font-size:12px;">
 
                     <!-- HEADER -->
@@ -63,11 +62,11 @@
                                 <t t-if="unit_product">
                                     <div>
                                         <strong>Unit Name:</strong>
-                                        <span t-field="unit_product.name"/>
+                                        <span t-out="unit_product.with_context(lang='en_US').name"/>
                                     </div>
                                     <div>
                                         <strong>Unit Category:</strong>
-                                        <span t-field="unit_product.categ_id"/>
+                                        <span t-out="unit_product.categ_id.with_context(lang='en_US').name"/>
                                     </div>
                                     <div>
                                         <strong>Unit Type:</strong>
@@ -143,7 +142,7 @@
                                         <span t-field="l.partner_id"/>
                                     </td>
                                     <td style="text-align:right;">
-                                        <span t-field="l.payment_amount"/>
+                                        <span t-out="l.payment_amount"/>
                                     </td>
                                     <td>
                                         <span t-esc="l.due_date.strftime('%d/%m/%Y') if l.due_date else ''"/>
