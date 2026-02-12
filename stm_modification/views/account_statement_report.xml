@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <record id="action_report_account_statement" model="ir.actions.report">
         <field name="name">Account Statement</field>
         <field name="model">account.statement.wizard</field>
