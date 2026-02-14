@@ -17,10 +17,26 @@ class PDCWizard(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _description = "PDC Wizard"
 
-    _sql_constraints = [
-        ('reference_unique', 'UNIQUE(reference)',
-         'Cheque reference must be unique! This reference already exists in the system.')
-    ]
+    # _sql_constraints = [
+    #     ('reference_unique', 'UNIQUE(reference)',
+    #      'Cheque reference must be unique! This reference already exists in the system.')
+    # ]
+
+    @api.constrains('reference')
+    def _check_reference_unique(self):
+        for record in self:
+            if not record.reference:
+                continue
+
+            existing = self.search([
+                ('reference', '=', record.reference),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if existing:
+                raise ValidationError(
+                    "Cheque reference must be unique! This reference already exists in the system."
+                )
 
     # pdc only be allowed to delete in draft state
     def unlink(self):
