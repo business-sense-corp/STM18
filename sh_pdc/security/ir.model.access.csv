@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_pdc_wizard,access_pdc_wizard,model_pdc_wizard,base.group_user,1,1,1,1
 access_pdc_return_wizard_user,access.pdc.return.wizard.user,model_pdc_return_wizard,base.group_user,1,1,1,1
 access_pdc_return_wizard_manager,access.pdc.return.wizard.manager,model_pdc_return_wizard,account.group_account_manager,1,1,1,1
+access_pdc_wizard_manager,pdc_wizard_manager,model_pdc_wizard,,1,1,1,1

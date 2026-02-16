@@ -16,7 +16,7 @@
     ],
     'assets': {
         'web.report_assets_common': [
-            'account_statement_report/static/src/css/account_statement_report.css',
+            'stm_modification/static/src/css/account_statement_report.css',
         ],
     },
     'installable': True,
