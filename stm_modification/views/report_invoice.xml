@@ -16,6 +16,7 @@
             <t t-call="web.external_layout">
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
+
                         <style>
                             .invoice-title {
                             font-size: 36px;
@@ -153,12 +154,32 @@
                             padding-top: 8px;
                             border-top: 2px solid #e0e0e0;
                             }
+
+                            /* ---- FIX: prevent server/theme css from adding unwanted borders to
+                            the header layout table ---- */
+                            .inv-header-table, .inv-header-table *{
+                            border: 0 !important;
+                            outline: 0 !important;
+                            box-shadow: none !important;
+                            }
+                            .inv-header-table{
+                            border-collapse: collapse !important;
+                            border-spacing: 0 !important;
+                            }
+                            .inv-header-table td, .inv-header-table th{
+                            border: 0 !important;
+                            }
+                            /* also protect the spacer td so it doesn't show as a box */
+                            .inv-header-table .inv-spacer{
+                            border: 0 !important;
+                            }
                         </style>
 
-                        <table style="width:100%; margin-top:0;">
+                        <table class="inv-header-table"
+                            style="width:100%; margin-top:0; border:0 !important;">
                             <tr>
                                 <!-- LEFT -->
-                                <td style="width:50%; vertical-align:top;">
+                                <td style="width:50%; vertical-align:top; border:0 !important;">
                                     <t t-if="o.company_id.logo">
                                         <img t-att-src="image_data_uri(o.company_id.logo)"
                                             style="max-width:200px; max-height:100px;" />
@@ -212,10 +233,11 @@
                                 </td>
 
                                 <!-- Center -->
-                                <td style="width:20%; vertical-align:top;"></td>
+                                <td class="inv-spacer"
+                                    style="width:20%; vertical-align:top; border:0 !important;"></td>
 
                                 <!-- RIGHT -->
-                                <td style="width:30%; vertical-align:top;">
+                                <td style="width:30%; vertical-align:top; border:0 !important;">
                                     <div style="margin-bottom:5px;">
                                         <span class="invoice-title auto-dir" t-field="o.name" />
                                     </div>
