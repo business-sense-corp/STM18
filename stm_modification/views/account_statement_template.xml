@@ -9,10 +9,78 @@
                 <t t-foreach="docs" t-as="o">
                     <div class="page" style="font-size:12px;">
 
+                        <style>
+                            .page{
+                            font-family: "Noto Naskh Arabic","Noto Sans Arabic","Noto Kufi
+                            Arabic","DejaVu Sans", Arial, sans-serif;
+                            }
+                            .auto-dir{ unicode-bidi: plaintext; }
+
+                            /* prevent server/theme css from adding borders to header tables */
+                            .header-table, .header-table *{
+                            border: 0 !important;
+                            outline: 0 !important;
+                            box-shadow: none !important;
+                            }
+                            .header-table{
+                            border-collapse: collapse !important;
+                            border-spacing: 0 !important;
+                            }
+                            .header-table td, .header-table th{
+                            border: 0 !important;
+                            }
+
+                            /* reset only inside units block */
+                            .units-block h1, .units-block h2, .units-block h3, .units-block h4,
+                            .units-block p {
+                            margin: 0; padding: 0;
+                            }
+                            .units-block table { margin: 0; }
+                            .units-block h3 { margin-top: 15px; text-align: center; }
+
+                            /* tables stronger, scoped */
+                            .units-block .tbl {
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 11px;
+                            }
+                            .units-block .tbl th {
+                            background: #f7f7f7;
+                            text-align: center;
+                            padding: 6px;
+                            border: 1px solid #cfcfcf;
+                            font-weight: 700;
+                            }
+                            .units-block .tbl td {
+                            padding: 6px;
+                            border: 1px solid #cfcfcf;
+                            vertical-align: middle;
+                            }
+                            .units-block .text-right { text-align: right; }
+                            .units-block .text-center { text-align: center; }
+                            .units-block .nowrap { white-space: nowrap; }
+
+                            .units-block .section-title {
+                            font-size: 12px;
+                            font-weight: 700;
+                            text-align: left;
+                            padding: 6px 8px;
+                            margin: 14px 0 6px 0;
+                            border: 1px solid #cfcfcf;
+                            background: #f2f2f2;
+                            }
+                            .units-block .muted { color: #666; font-weight: 400; }
+                            .units-block .empty-row { text-align: center; color: #666; font-style:
+                            italic; padding: 10px 0; }
+                            .units-block .unit-sep { border-top: 1px dashed #cfcfcf; margin: 10px 0
+                            0 0; }
+                        </style>
+
                         <!-- HEADER -->
-                        <table style="width:100%; margin-bottom:15px;">
+                        <table class="header-table"
+                            style="width:100%; margin-bottom:15px; border:0 !important;">
                             <tr>
-                                <td style="width:70%;">
+                                <td style="width:70%; border:0 !important;">
                                     <t t-if="company.logo">
                                         <img t-att-src="image_data_uri(company.logo)"
                                             style="max-height:100px;" />
@@ -56,7 +124,7 @@
                                     </t>
                                 </td>
 
-                                <td style="width:30%;">
+                                <td style="width:30%; border:0 !important;">
                                     <h2 style="margin-bottom:5px;">Account Statement</h2>
                                     <div>
                                         <strong>Date:</strong>
@@ -96,59 +164,6 @@
 
                         <!-- UNITS INFORMATION -->
                         <div class="units-block">
-
-                            <style>
-                                .page{
-                                font-family: "Noto Naskh Arabic","Noto Sans Arabic","Noto Kufi
-                                Arabic","DejaVu Sans", Arial, sans-serif;
-                                }
-                                .auto-dir{ unicode-bidi: plaintext; }
-
-                                /* reset only inside units block */
-                                .units-block h1, .units-block h2, .units-block h3, .units-block h4,
-                                .units-block p {
-                                margin: 0; padding: 0;
-                                }
-                                .units-block table { margin: 0; }
-                                .units-block h3 { margin-top: 15px; text-align: center; }
-
-                                /* tables stronger, scoped */
-                                .units-block .tbl {
-                                width: 100%;
-                                border-collapse: collapse;
-                                font-size: 11px;
-                                }
-                                .units-block .tbl th {
-                                background: #f7f7f7;
-                                text-align: center;
-                                padding: 6px;
-                                border: 1px solid #cfcfcf;
-                                font-weight: 700;
-                                }
-                                .units-block .tbl td {
-                                padding: 6px;
-                                border: 1px solid #cfcfcf;
-                                vertical-align: middle;
-                                }
-                                .units-block .text-right { text-align: right; }
-                                .units-block .text-center { text-align: center; }
-                                .units-block .nowrap { white-space: nowrap; }
-
-                                .units-block .section-title {
-                                font-size: 12px;
-                                font-weight: 700;
-                                text-align: left;
-                                padding: 6px 8px;
-                                margin: 14px 0 6px 0;
-                                border: 1px solid #cfcfcf;
-                                background: #f2f2f2;
-                                }
-                                .units-block .muted { color: #666; font-weight: 400; }
-                                .units-block .empty-row { text-align: center; color: #666;
-                                font-style: italic; padding: 10px 0; }
-                                .units-block .unit-sep { border-top: 1px dashed #cfcfcf; margin:
-                                10px 0 0 0; }
-                            </style>
 
                             <h3 style="margin-top:15px; text-align:center;">Units Information</h3>
 
@@ -270,11 +285,9 @@
                                 </p>
                             </t>
 
-                        </div> <!--
-                        /units-block -->
+                        </div>
 
-                    </div> <!--
-                    /page -->
+                    </div>
                 </t>
 
             </t>
