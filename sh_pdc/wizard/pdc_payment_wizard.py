@@ -58,7 +58,6 @@ class PDCWizard(models.Model):
     def _check_unique_reference(self):
         """Check that cheque reference is unique and not used as old reference"""
         for record in self:
-            # تجاهل الـ placeholder
             if not record.reference or record.reference.strip() == '/':
                 continue
 

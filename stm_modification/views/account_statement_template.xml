@@ -3,7 +3,6 @@
 
     <template id="statement_report_template">
         <t t-call="web.html_container">
-
             <t t-call="web.external_layout">
 
                 <t t-foreach="docs" t-as="o">
@@ -16,7 +15,6 @@
                             }
                             .auto-dir{ unicode-bidi: plaintext; }
 
-                            /* prevent server/theme css from adding borders to header tables */
                             .header-table, .header-table *{
                             border: 0 !important;
                             outline: 0 !important;
@@ -26,54 +24,104 @@
                             border-collapse: collapse !important;
                             border-spacing: 0 !important;
                             }
-                            .header-table td, .header-table th{
-                            border: 0 !important;
-                            }
+                            .header-table td, .header-table th{ border: 0 !important; }
 
-                            /* reset only inside units block */
                             .units-block h1, .units-block h2, .units-block h3, .units-block h4,
-                            .units-block p {
-                            margin: 0; padding: 0;
-                            }
+                            .units-block p { margin: 0; padding: 0; }
                             .units-block table { margin: 0; }
-                            .units-block h3 { margin-top: 15px; text-align: center; }
 
-                            /* tables stronger, scoped */
-                            .units-block .tbl {
+                            .units-title{
+                            margin: 14px 0 10px 0;
+                            text-align:center;
+                            font-size: 18px;
+                            font-weight: 700;
+                            letter-spacing: .2px;
+                            }
+
+                            .units-block .tbl{
                             width: 100%;
                             border-collapse: collapse;
-                            font-size: 11px;
+                            font-size: 10.5px;
                             }
-                            .units-block .tbl th {
-                            background: #f7f7f7;
+                            .units-block .tbl th{
+                            background: #f3f5f7;
                             text-align: center;
-                            padding: 6px;
-                            border: 1px solid #cfcfcf;
+                            padding: 7px 6px;
+                            border: 1px solid #d7d7d7;
                             font-weight: 700;
                             }
-                            .units-block .tbl td {
-                            padding: 6px;
-                            border: 1px solid #cfcfcf;
+                            .units-block .tbl td{
+                            padding: 7px 6px;
+                            border: 1px solid #d7d7d7;
                             vertical-align: middle;
                             }
-                            .units-block .text-right { text-align: right; }
-                            .units-block .text-center { text-align: center; }
-                            .units-block .nowrap { white-space: nowrap; }
 
-                            .units-block .section-title {
+                            .text-right{ text-align:right; }
+                            .text-center{ text-align:center; }
+                            .nowrap{ white-space: nowrap; }
+
+                            .unit-card{
+                            border: 1px solid #d7d7d7;
+                            border-radius: 6px;
+                            padding: 10px 10px 6px 10px;
+                            margin: 10px 0 12px 0;
+                            background: #fff;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                            }
+
+                            .section-title{
                             font-size: 12px;
                             font-weight: 700;
-                            text-align: left;
-                            padding: 6px 8px;
-                            margin: 14px 0 6px 0;
-                            border: 1px solid #cfcfcf;
-                            background: #f2f2f2;
+                            padding: 8px 10px;
+                            margin: 0 0 8px 0;
+                            border: 1px solid #d7d7d7;
+                            border-radius: 6px;
+                            background: #f7f7f7;
                             }
-                            .units-block .muted { color: #666; font-weight: 400; }
-                            .units-block .empty-row { text-align: center; color: #666; font-style:
-                            italic; padding: 10px 0; }
-                            .units-block .unit-sep { border-top: 1px dashed #cfcfcf; margin: 10px 0
-                            0 0; }
+                            .muted{ color:#666; font-weight:400; }
+
+                            .empty-row{
+                            text-align:center;
+                            color:#666;
+                            font-style: italic;
+                            padding: 10px 0;
+                            }
+
+                            .summary-card{
+                            margin-top: 8px;
+                            border: 1px solid #d7d7d7;
+                            border-radius: 6px;
+                            overflow: hidden;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                            }
+                            .summary-head{
+                            background:#f3f5f7;
+                            font-weight:700;
+                            text-align:center;
+                            padding: 6px 8px;
+                            border-bottom: 1px solid #d7d7d7;
+                            }
+                            .summary-grid{
+                            width:100%;
+                            border-collapse: collapse;
+                            font-size: 10.5px;
+                            }
+                            .summary-grid td{
+                            border-right: 1px solid #d7d7d7;
+                            border-bottom: 1px solid #d7d7d7;
+                            padding: 7px 8px;
+                            vertical-align: middle;
+                            }
+                            .summary-grid tr:last-child td{ border-bottom: 0; }
+                            .summary-grid td:last-child{ border-right: 0; }
+
+                            .k{ color:#555; font-weight:700; }
+                            .v{ font-weight:700; }
+
+                            table { page-break-inside: auto; }
+                            tr { page-break-inside: avoid; page-break-after: auto; }
                         </style>
 
                         <!-- HEADER -->
@@ -104,7 +152,7 @@
 
                                     <!-- CUSTOMER -->
                                     <t t-if="docs">
-                                        <h3>Customer Information</h3>
+                                        <h3 style="margin-top:10px;">Customer Information</h3>
                                         <div>
                                             <strong>Name:</strong>
                                             <span class="auto-dir" t-field="o.name" />
@@ -133,7 +181,7 @@
 
                                     <br />
 
-                                    <!-- PAYMENTS SUMMARY -->
+                                    <!-- PAYMENTS SUMMARY (OVERALL) -->
                                     <div>
                                         <strong>Collected Amount:</strong>
                                         <span t-esc="collected_amount" />
@@ -165,12 +213,12 @@
                         <!-- UNITS INFORMATION -->
                         <div class="units-block">
 
-                            <h3 style="margin-top:15px; text-align:center;">Units Information</h3>
+                            <div class="units-title">Units Information</div>
 
                             <t t-if="units">
 
                                 <!-- Units table -->
-                                <table class="tbl" style="margin-top:10px; margin-bottom:12px;">
+                                <table class="tbl" style="margin-top:6px; margin-bottom:12px;">
                                     <thead>
                                         <tr>
                                             <th class="nowrap">Unit Name</th>
@@ -207,74 +255,114 @@
 
                                 <!-- Installments per unit -->
                                 <t t-foreach="units" t-as="u">
-                                    <div class="section-title"> Installments / Assignments - <span
-                                            class="auto-dir" t-esc="u['unit_product'].name" />
-                                        <span
-                                            class="muted"> (Count: <span
-                                                t-esc="len(u['installments'])" />) </span>
-                                    </div>
+                                    <div class="unit-card">
 
-                                    <table class="tbl" style="margin-bottom:14px;">
-                                        <thead>
-                                            <tr>
-                                                <th class="nowrap">Payment Date</th>
-                                                <th class="nowrap">Name</th>
-                                                <th class="nowrap">Payment Journal</th>
-                                                <th>Partner</th>
-                                                <th class="nowrap">Payment Amount</th>
-                                                <th class="nowrap">Due Date</th>
-                                                <th class="nowrap">Installment No.</th>
-                                                <th class="nowrap">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <t t-if="u['installments']">
-                                                <t t-foreach="u['installments']" t-as="l">
+                                        <div class="section-title"> Installments / Assignments - <span
+                                                class="auto-dir" t-esc="u['unit_product'].name" />
+                                            <span
+                                                class="muted"> (Count: <span
+                                                    t-esc="len(u['installments'])" />) </span>
+                                        </div>
+
+                                        <table class="tbl" style="margin-bottom:6px;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="nowrap">Payment Date</th>
+                                                    <th class="nowrap">Name</th>
+                                                    <th class="nowrap">Payment Journal</th>
+                                                    <th>Partner</th>
+                                                    <th class="nowrap">Payment Amount</th>
+                                                    <th class="nowrap">Due Date</th>
+                                                    <th class="nowrap">Installment No.</th>
+                                                    <th class="nowrap">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-if="u['installments']">
+                                                    <t t-foreach="u['installments']" t-as="l">
+                                                        <tr>
+                                                            <td class="nowrap">
+                                                                <span
+                                                                    t-esc="l.payment_date.strftime('%d/%m/%Y') if l.payment_date else ''" />
+                                                            </td>
+                                                            <td class="nowrap">
+                                                                <span class="auto-dir"
+                                                                    t-field="l.name" />
+                                                            </td>
+                                                            <td class="nowrap">
+                                                                <span
+                                                                    t-esc="l.journal_id.with_context(lang='en_US').name" />
+                                                            </td>
+                                                            <td class="nowrap">
+                                                                <span class="auto-dir"
+                                                                    t-field="l.partner_id" />
+                                                            </td>
+                                                            <td class="text-right nowrap">
+                                                                <span t-field="l.payment_amount" />
+                                                            </td>
+                                                            <td class="nowrap">
+                                                                <span
+                                                                    t-esc="l.due_date.strftime('%d/%m/%Y') if l.due_date else ''" />
+                                                            </td>
+                                                            <td class="text-center nowrap">
+                                                                <span t-esc="l.installment_no" />
+                                                            </td>
+                                                            <td class="text-center nowrap">
+                                                                <span t-esc="l.state" />
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </t>
+
+                                                <t t-if="not u['installments']">
                                                     <tr>
-                                                        <td class="nowrap">
-                                                            <span
-                                                                t-esc="l.payment_date.strftime('%d/%m/%Y') if l.payment_date else ''" />
-                                                        </td>
-                                                        <td class="nowrap">
-                                                            <span class="auto-dir" t-field="l.name" />
-                                                        </td>
-                                                        <td class="nowrap">
-                                                            <span
-                                                                t-esc="l.journal_id.with_context(lang='en_US').name" />
-                                                        </td>
-                                                        <td class="nowrap">
-                                                            <span class="auto-dir"
-                                                                t-field="l.partner_id" />
-                                                        </td>
-                                                        <td class="text-right nowrap">
-                                                            <span t-field="l.payment_amount" />
-                                                        </td>
-                                                        <td class="nowrap">
-                                                            <span
-                                                                t-esc="l.due_date.strftime('%d/%m/%Y') if l.due_date else ''" />
-                                                        </td>
-                                                        <td class="text-center nowrap">
-                                                            <span t-esc="l.installment_no" />
-                                                        </td>
-                                                        <td class="text-center nowrap">
-                                                            <span t-esc="l.state" />
+                                                        <td colspan="8" class="empty-row">
+                                                            No assignments/installments found for
+                                                            this unit.
                                                         </td>
                                                     </tr>
                                                 </t>
-                                            </t>
+                                            </tbody>
+                                        </table>
 
-                                            <t t-if="not u['installments']">
-                                                <tr>
-                                                    <td colspan="8" class="empty-row">
-                                                        No assignments/installments found for this
-                                                        unit.
-                                                    </td>
-                                                </tr>
-                                            </t>
-                                        </tbody>
-                                    </table>
+                                        <!-- CHEQUES SUMMARY PER UNIT -->
+                                        <t t-set="cs" t-value="u.get('cheque_summary') or {}" />
 
-                                    <div class="unit-sep"></div>
+                                        <t t-if="cs.get('total', 0) > 0">
+                                            <div class="summary-card">
+                                                <div class="summary-head">Cheques Summary</div>
+
+                                                <table class="summary-grid">
+                                                    <tr>
+                                                        <td class="k">Collected Amount</td>
+                                                        <td class="v text-right nowrap">
+                                                            <span
+                                                                t-esc="cs.get('collected_amount', 0.0)" />
+                                                        </td>
+                                                        <td class="k">Remaining Amount</td>
+                                                        <td class="v text-right nowrap">
+                                                            <span
+                                                                t-esc="cs.get('remaining_amount', 0.0)" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="k">Total Cheques</td>
+                                                        <td class="v text-center nowrap">
+                                                            <span t-esc="cs.get('total', 0)" />
+                                                        </td>
+                                                        <td class="k">Collected / Rejected /
+                                                            Remaining</td>
+                                                        <td class="v text-center nowrap">
+                                                            <span t-esc="cs.get('collected', 0)" />
+                                                            / <span t-esc="cs.get('rejected', 0)" />
+                                                            / <span t-esc="cs.get('remaining', 0)" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </t>
+
+                                    </div>
                                 </t>
 
                             </t>
