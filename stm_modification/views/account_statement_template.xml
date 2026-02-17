@@ -122,6 +122,26 @@
 
                             table { page-break-inside: auto; }
                             tr { page-break-inside: avoid; page-break-after: auto; }
+
+                            /* FORCE REMOVE THEME BLACK BORDERS */
+                            .unit-card,
+                            .unit-card *,
+                            .units-block table,
+                            .units-block th,
+                            .units-block td,
+                            .summary-card,
+                            .summary-card *,
+                            .summary-grid,
+                            .summary-grid td {
+                            border-color: #d7d7d7 !important;
+                            }
+
+                            /* Ensure outer cards are clean and consistent */
+                            .unit-card,
+                            .summary-card {
+                            border: 1px solid #d7d7d7 !important;
+                            }
+
                         </style>
 
                         <!-- HEADER -->
