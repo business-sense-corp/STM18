@@ -33,36 +33,7 @@ class PDCWizard(models.Model):
 
         return super().unlink()
 
-    # @api.constrains('reference')
-    # def _check_unique_reference(self):
-    #     """Check that cheque reference is unique and not used as old reference"""
-    #     for record in self:
-    #         if not record.reference or record.reference.strip() == '/':
-    #             continue
 
-    #         duplicate = self.search([
-    #             ('reference', '=', record.reference),
-    #             ('id', '!=', record.id)
-    #         ], limit=1)
-
-    #         if duplicate:
-    #             raise ValidationError(
-    #                 f"Cheque reference '{record.reference}' already exists!\n"
-    #                 f"Duplicate found in PDC: {duplicate.name}\n"
-    #                 f"Please use a different cheque reference number."
-    #             )
-
-    #         old_duplicate = self.search([
-    #             ('old_reference', '=', record.reference),
-    #             ('id', '!=', record.id)
-    #         ], limit=1)
-
-    #         if old_duplicate:
-    #             raise ValidationError(
-    #                 f"Cheque reference '{record.reference}' was previously used!\n"
-    #                 f"This reference was used before in PDC: {old_duplicate.name}\n"
-    #                 f"Please use a different cheque reference number."
-    #             )
 
     @api.constrains('reference')
     def _check_reference_not_old_reference(self):
