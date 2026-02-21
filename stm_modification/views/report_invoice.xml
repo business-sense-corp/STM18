@@ -7,242 +7,324 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">stm_modification.report_invoice_custom</field>
         <field name="report_file">stm_modification.report_invoice_custom</field>
-        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move" />
         <field name="binding_type">report</field>
     </record>
 
     <template id="report_invoice_custom">
         <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <div class="page">
-                    <style>
-                        .invoice-title {
-                        font-size: 36px;
-                        font-weight: bold;
-                        color: #999;
-                        text-align: right;
-                        margin-bottom: 20px;
-                        }
-                        .invoice-info-table {
-                        width: 100%;
-                        margin-bottom: 30px;
-                        }
-                        .invoice-info-box {
-                        background-color: #e8e8e8;
-                        padding: 8px;
-                        font-weight: bold;
-                        text-align: center;
-                        border: 1px solid #ccc;
-                        }
-                        .invoice-info-value {
-                        padding: 8px;
-                        text-align: center;
-                        border: 1px solid #ccc;
-                        }
-                        .address-box {
-                        background-color: #e8e8e8;
-                        padding: 10px;
-                        margin-bottom: 20px;
-                        border: 1px solid #ccc;
-                        }
-                        .address-title {
-                        font-weight: bold;
-                        margin-bottom: 5px;
-                        }
-                        .items-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 20px;
-                        }
-                        .items-table th {
-                        background-color: #e8e8e8;
-                        padding: 10px;
-                        text-align: left;
-                        border: 1px solid #ccc;
-                        font-weight: bold;
-                        }
-                        .items-table td {
-                        padding: 10px;
-                        border: 1px solid #ccc;
-                        }
-                        .text-right {
-                        text-align: right;
-                        }
-                        .thank-you {
-                        text-align: center;
-                        font-style: italic;
-                        margin-top: 30px;
-                        }
+            <t t-call="web.basic_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
 
-                        .page {
-                        padding-top: 0px !important;
-                        margin-top: 0px !important;
-                        }
+                        <style>
+                            .invoice-title {
+                            font-size: 36px;
+                            font-weight: bold;
+                            color: #999;
+                            text-align: right;
+                            margin-bottom: 20px;
+                            }
+                            .invoice-info-table {
+                            width: 100%;
+                            margin-bottom: 30px;
+                            }
+                            .invoice-info-box {
+                            background-color: #e8e8e8;
+                            padding: 8px;
+                            font-weight: bold;
+                            text-align: center;
+                            border: 1px solid #ccc;
+                            }
+                            .invoice-info-value {
+                            padding: 8px;
+                            text-align: center;
+                            border: 1px solid #ccc;
+                            }
+                            .address-box {
+                            background-color: #e8e8e8;
+                            padding: 10px;
+                            margin-bottom: 20px;
+                            border: 1px solid #ccc;
+                            }
+                            .address-title {
+                            font-weight: bold;
+                            margin-bottom: 5px;
+                            }
+                            .items-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                            }
+                            .items-table th {
+                            background-color: #e8e8e8;
+                            padding: 10px;
+                            text-align: left;
+                            border: 1px solid #ccc;
+                            font-weight: bold;
+                            }
+                            .items-table td {
+                            padding: 10px;
+                            border: 1px solid #ccc;
+                            }
+                            .text-right {
+                            text-align: right;
+                            }
+                            .thank-you {
+                            text-align: center;
+                            font-style: italic;
+                            margin-top: 30px;
+                            }
 
-                        .header-block {
-                        margin-bottom: 15px;
-                        }
+                            .page {
+                            padding-top: 0px !important;
+                            margin-top: 0px !important;
+                            }
 
-                        .section-title {
-                        font-size: 15px;
-                        font-weight: bold;
-                        margin: 12px 0 6px 0;
-                        border-bottom: 1px solid #ddd;
-                        padding-bottom: 3px;
-                        }
+                            .header-block {
+                            margin-bottom: 15px;
+                            }
 
-                        .info-row {
-                        margin-bottom: 4px;
-                        line-height: 1.4;
-                        }
+                            .section-title {
+                            font-size: 15px;
+                            font-weight: bold;
+                            margin: 12px 0 6px 0;
+                            border-bottom: 1px solid #ddd;
+                            padding-bottom: 3px;
+                            }
 
-                        .info-label {
-                        font-weight: bold;
-                        display: inline-block;
-                        width: 120px;
-                        color: #444;
-                        }
-                    </style>
+                            .info-row {
+                            margin-bottom: 4px;
+                            line-height: 1.4;
+                            }
 
-                    <table style="width:100%; margin-top:0;">
-                        <tr>
-                            <!-- LEFT -->
-                            <td style="width:50%; vertical-align:top;">
-                                <t t-if="o.company_id.logo">
-                                    <img t-att-src="image_data_uri(o.company_id.logo)"
-                                         style="max-width:200px; max-height:100px;"/>
-                                </t>
-                                <br/>
+                            .info-label {
+                            font-weight: bold;
+                            display: inline-block;
+                            width: 120px;
+                            color: #444;
+                            }
 
-                                <strong style="margin-bottom:5px;">
-                                    <span t-field="o.company_id.name"/>
-                                </strong>
-                                <br/>
-                                <span t-field="o.company_id.street"/>
-                                <br style="margin-bottom:5px;"/>
-                                <span t-field="o.company_id.street2"/>
-                                <span t-field="o.company_id.city"/>
-                                <t t-if="o.company_id.state_id">,
-                                    <span t-field="o.company_id.state_id"/>
-                                </t>
-                                <t t-if="o.company_id.zip">
-                                    <span t-field="o.company_id.zip"/>
-                                </t>
-                                <br style="margin-bottom:5px;"/>
-                                <t t-if="o.company_id.phone">
-                                    <strong>Phone:</strong>
-                                    <span t-field="o.company_id.phone"/>
-                                </t>
+                            /* Arabic + small style polish (no layout changes) */
+                            .page{
+                            font-family: "Noto Naskh Arabic","Noto Sans Arabic","Noto Kufi
+                            Arabic","DejaVu Sans", Arial, sans-serif;
+                            font-size: 12px;
+                            line-height: 1.45;
+                            color: #222;
+                            }
+                            .auto-dir{ unicode-bidi: plaintext; }
+                            .ar{ direction: rtl; text-align: right; }
 
-                                <h3>Customer Information</h3>
-                                <div style="margin-bottom:5px;">
-                                    <strong>Name</strong>
-                                    <span t-field="o.partner_id"/>
-                                </div>
-                                <div style="margin-bottom:5px;">
-                                    <strong style="margin-bottom:5px;">Address</strong>
-                                    <span t-field="o.partner_id.street"/>
-                                    <span t-field="o.partner_id.street2"/>
-                                    <br style="margin-bottom:5px;"/>
-                                    <span t-field="o.partner_id.city"/>
-                                    <span t-field="o.partner_id.state_id"/>
-                                </div>
-                                <div style="margin-bottom:5px;">
-                                    <strong>Phone Number</strong>
-                                    <span t-field="o.partner_id.phone"/>
-<!--                                    <span> / </span>-->
-<!--                                    <span t-field="o.partner_id.mobile"/>-->
-                                </div>
-                                <div style="margin-bottom:5px;">
-                                    <strong>Email</strong>
-                                    <span t-field="o.partner_id.email"/>
-                                </div>
-                            </td>
+                            h3{
+                            margin: 10px 0 8px 0;
+                            font-size: 18px;
+                            font-weight: 700;
+                            color: #222;
+                            }
 
-                            <!--                                Center -->
-                            <td style="width:20%; vertical-align:top;">
-                            </td>
+                            .info-block{
+                            padding: 10px 12px;
+                            border: 1px solid #d9d9d9;
+                            background: #fafafa;
+                            border-radius: 6px;
+                            }
+                            .info-row{ margin-bottom: 6px; }
+                            .info-row strong{
+                            display: inline-block;
+                            min-width: 110px;
+                            color: #444;
+                            }
 
-                            <!-- RIGHT -->
-                            <td style="width:30%; vertical-align:top;">
-                                <div style="margin-bottom:5px;">
-                                    <span class="invoice-title" t-field="o.name"/>
-                                </div>
-                                <div>
+                            .items-table{
+                            margin-top: 14px;
+                            }
+                            .items-table th{
+                            background-color: #efefef;
+                            padding: 9px 10px;
+                            border: 1px solid #cfcfcf;
+                            }
+                            .items-table td{
+                            padding: 9px 10px;
+                            border: 1px solid #cfcfcf;
+                            }
+
+                            .total-box{
+                            margin-top: 12px;
+                            padding-top: 8px;
+                            border-top: 2px solid #e0e0e0;
+                            }
+
+                            /* ---- FIX: prevent server/theme css from adding unwanted borders to
+                            the header layout table ---- */
+                            .inv-header-table, .inv-header-table *{
+                            border: 0 !important;
+                            outline: 0 !important;
+                            box-shadow: none !important;
+                            }
+                            .inv-header-table{
+                            border-collapse: collapse !important;
+                            border-spacing: 0 !important;
+                            }
+                            .inv-header-table td, .inv-header-table th{
+                            border: 0 !important;
+                            }
+                            /* also protect the spacer td so it doesn't show as a box */
+                            .inv-header-table .inv-spacer{
+                            border: 0 !important;
+                            }
+                        </style>
+
+                        <table class="inv-header-table"
+                            style="width:100%; margin-top:0; border:0 !important;">
+                            <tr>
+                                <!-- LEFT -->
+                                <td style="width:50%; vertical-align:top; border:0 !important;">
+                                    <t t-if="o.company_id.logo">
+                                        <img t-att-src="image_data_uri(o.company_id.logo)"
+                                            style="max-width:200px; max-height:100px;" />
+                                    </t>
+                                    <br />
+
                                     <strong style="margin-bottom:5px;">
-                                        <span t-field="o.invoice_date"/>
+                                        <span class="auto-dir ar" t-field="o.company_id.name" />
                                     </strong>
-                                </div>
+                                    <br />
+                                    <span class="auto-dir ar" t-field="o.company_id.street" />
+                                    <br style="margin-bottom:5px;" />
+                                    <span class="auto-dir ar" t-field="o.company_id.street2" />
+                                    <span class="auto-dir ar" t-field="o.company_id.city" />
+                                    <t t-if="o.company_id.state_id">, <span class="auto-dir ar"
+                                            t-field="o.company_id.state_id" />
+                                    </t>
+                                    <t t-if="o.company_id.zip">
+                                        <span class="auto-dir" t-field="o.company_id.zip" />
+                                    </t>
+                                    <br style="margin-bottom:5px;" />
+                                    <t t-if="o.company_id.phone">
+                                        <strong>Phone:</strong>
+                                        <span class="auto-dir" t-field="o.company_id.phone" />
+                                    </t>
 
-                                <br/>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <h3>Unit Information</h3>
-                                <div style="margin-bottom:5px;">
-                                    <strong>Unit Name</strong>
-                                    <span t-field="o.invoice_line_ids[0].product_id"/>
-                                </div>
-                                <div style="margin-bottom:5px;">
-                                    <strong>Unit Category</strong>
-                                    <span t-field="o.invoice_line_ids[0].product_uom_category_id"/>
-                                </div>
-                                <div style="margin-bottom:5px;">
-                                    <strong>Unit Type</strong>
-                                    <span t-field="o.invoice_line_ids[0].product_id.project_type"/>
-                                </div>
-                                <div style="margin-bottom:5px;">
-                                    <strong>Project</strong>
-                                    <span t-field="o.invoice_line_ids[0].product_id.project_location"/>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                                    <h3>Customer Information</h3>
+                                    <div class="info-block">
+                                        <div class="info-row">
+                                            <strong>Name</strong>
+                                            <span class="auto-dir ar" t-field="o.partner_id" />
+                                        </div>
+                                        <div class="info-row">
+                                            <strong>Address</strong>
+                                            <span class="auto-dir ar" t-field="o.partner_id.street" />
+                                            <span class="auto-dir ar" t-field="o.partner_id.street2" />
+                                            <br />
+                                            <span class="auto-dir ar" t-field="o.partner_id.city" />
+                                            <span class="auto-dir ar"
+                                                t-field="o.partner_id.state_id" />
+                                        </div>
+                                        <div class="info-row">
+                                            <strong>Phone Number</strong>
+                                            <span class="auto-dir" t-field="o.partner_id.phone" />
+                                        </div>
+                                        <div class="info-row" style="margin-bottom:0;">
+                                            <strong>Email</strong>
+                                            <span class="auto-dir" t-field="o.partner_id.email" />
+                                        </div>
+                                    </div>
+                                </td>
 
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50%;">DESCRIPTION</th>
-                                <th style="width: 10%;" class="text-right">QTY</th>
-                                <th style="width: 20%;" class="text-right">UNIT PRICE</th>
-                                <th style="width: 20%;" class="text-right">AMOUNT</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="o.invoice_line_ids" t-as="line">
-                                <tr>
-                                    <td>
-                                        <span t-field="line.name"/>
-                                    </td>
-                                    <td class="text-right">
-                                        <span t-field="line.quantity"/>
-                                    </td>
-                                    <td class="text-right">
-                                        <span t-field="line.price_unit"/>
-                                    </td>
-                                    <td class="text-right">
-                                        <span t-field="line.price_subtotal"/>
-                                    </td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
+                                <!-- Center -->
+                                <td class="inv-spacer"
+                                    style="width:20%; vertical-align:top; border:0 !important;"></td>
 
-                    <div style="text-align: right; margin-top: 20px;">
-                        <table style="float: right; width: 300px;">
-                            <tr>
-                                <td style="font-weight: bold; font-size: 16px;">TOTAL</td>
-                                <td style="font-weight: bold; font-size: 16px; text-align: right;">
-                                    <span t-field="o.amount_total"/>
+                                <!-- RIGHT -->
+                                <td style="width:30%; vertical-align:top; border:0 !important;">
+                                    <div style="margin-bottom:5px;">
+                                        <span class="invoice-title auto-dir" t-field="o.name" />
+                                    </div>
+                                    <div>
+                                        <strong style="margin-bottom:5px;">
+                                            <span t-field="o.invoice_date" />
+                                        </strong>
+                                    </div>
+
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <br />
+
+                                    <h3>Unit Information</h3>
+                                    <div class="info-block">
+                                        <div class="info-row">
+                                            <strong>Unit Name</strong>
+                                            <span class="auto-dir ar"
+                                                t-field="o.invoice_line_ids[0].product_id" />
+                                        </div>
+                                        <div class="info-row">
+                                            <strong>Unit Category</strong>
+                                            <span class="auto-dir ar"
+                                                t-field="o.invoice_line_ids[0].product_uom_category_id" />
+                                        </div>
+                                        <div class="info-row">
+                                            <strong>Unit Type</strong>
+                                            <span class="auto-dir ar"
+                                                t-field="o.invoice_line_ids[0].product_id.project_type" />
+                                        </div>
+                                        <div class="info-row" style="margin-bottom:0;">
+                                            <strong>Project</strong>
+                                            <span class="auto-dir ar"
+                                                t-field="o.invoice_line_ids[0].product_id.project_location" />
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
-                        <div style="clear: both;"></div>
-                    </div>
 
-                </div>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%;">DESCRIPTION</th>
+                                    <th style="width: 10%;" class="text-right">QTY</th>
+                                    <th style="width: 20%;" class="text-right">UNIT PRICE</th>
+                                    <th style="width: 20%;" class="text-right">AMOUNT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.invoice_line_ids" t-as="line">
+                                    <tr>
+                                        <td>
+                                            <span class="auto-dir ar" t-field="line.name" />
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.quantity" />
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.price_unit" />
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.price_subtotal" />
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div class="total-box" style="text-align: right; margin-top: 20px;">
+                            <table style="float: right; width: 300px;">
+                                <tr>
+                                    <td style="font-weight: bold; font-size: 16px;">TOTAL</td>
+                                    <td
+                                        style="font-weight: bold; font-size: 16px; text-align: right;">
+                                        <span t-field="o.amount_total" />
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="clear: both;"></div>
+                        </div>
+
+                    </div>
+                </t>
             </t>
         </t>
     </template>

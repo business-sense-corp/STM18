@@ -30,7 +30,7 @@
                             <field name="bank_id"/>
                             <field name="invoice_ids" readonly="1" widget="many2many_tags"/>
                             <field name="attachment_ids" widget="many2many_binary" string="Attach Cheque Image"
-                                   nolabel="1" colspan="2"/>
+                                nolabel="1" colspan="2"/>
                             <field name="partner_bank_id"/>
                             <field name="old_reference"/>
                         </group>

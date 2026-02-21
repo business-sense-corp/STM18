@@ -17,10 +17,12 @@ class PDCWizard(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _description = "PDC Wizard"
 
-    _sql_constraints = [
-        ('reference_unique', 'UNIQUE(reference)',
-         'Cheque reference must be unique! This reference already exists in the system.')
-    ]
+
+
+    def _check_reference_ready(self):
+        for rec in self:
+            if not rec.reference or rec.reference.strip() == '/':
+                raise UserError("Please set a valid Cheque Reference.")
 
     # pdc only be allowed to delete in draft state
     def unlink(self):
@@ -31,36 +33,27 @@ class PDCWizard(models.Model):
 
         return super().unlink()
 
+
+
     @api.constrains('reference')
-    def _check_unique_reference(self):
-        """Check that cheque reference is unique and not used as old reference"""
+    def _check_reference_not_old_reference(self):
         for record in self:
-            if record.reference:
-                # Search for other records with the same reference
-                duplicate = self.search([
-                    ('reference', '=', record.reference),
-                    ('id', '!=', record.id)
-                ], limit=1)
+            ref = (record.reference or '').strip()
+            if not ref or ref == '/':
+                continue
 
-                if duplicate:
-                    raise ValidationError(
-                        f"Cheque reference '{record.reference}' already exists!\n"
-                        f"Duplicate found in PDC: {duplicate.name}\n"
-                        f"Please use a different cheque reference number."
-                    )
+            old_duplicate = self.search([
+                ('old_reference', '=', ref),
+                ('id', '!=', record.id)
+            ], limit=1)
 
-                # Also check if this reference was used before (in old_reference field)
-                old_duplicate = self.search([
-                    ('old_reference', '=', record.reference),
-                    ('id', '!=', record.id)
-                ], limit=1)
+            if old_duplicate:
+                raise ValidationError(
+                    "This cheque reference was used before (as an old reference) "
+                    f"in PDC: {old_duplicate.name}. Please use a different number."
+                )
 
-                if old_duplicate:
-                    raise ValidationError(
-                        f"Cheque reference '{record.reference}' was previously used!\n"
-                        f"This reference was used before in PDC: {old_duplicate.name}\n"
-                        f"Please use a different cheque reference number."
-                    )
+
 
     def action_register_check(self):
         active_ids = self.env.context.get('active_ids')
@@ -311,6 +304,8 @@ class PDCWizard(models.Model):
 
     # Register pdc payment
     def button_register(self):
+        self.ensure_one()
+        self._check_reference_ready() 
         listt = []
         if self:
 
@@ -338,6 +333,8 @@ class PDCWizard(models.Model):
                 self.write({'state': 'done'})
 
     def action_register(self):
+        self.ensure_one()
+        self._check_reference_ready()
         move = self.env['account.move']
 
         self.check_payment_amount()
@@ -620,6 +617,7 @@ class PDCWizard(models.Model):
 
     def action_deposited(self):
         self.ensure_one()
+        self._check_reference_ready()
         move = self.env['account.move']
 
         self.check_payment_amount()
@@ -683,6 +681,7 @@ class PDCWizard(models.Model):
 
     def action_cashed(self):
         self.ensure_one()
+        self._check_reference_ready()
         Move = self.env['account.move']
 
         self.check_payment_amount()
@@ -732,6 +731,7 @@ class PDCWizard(models.Model):
 
     def action_done(self):
         self.ensure_one()
+        self._check_reference_ready()
         Move = self.env['account.move']
 
         self.check_payment_amount()

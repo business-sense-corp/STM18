@@ -1,219 +1,79 @@
-/* Account Statement Report Styles */
-
 .statement-page {
-    font-family: Arial, sans-serif;
-    font-size: 10pt;
+    font-family: "Noto Naskh Arabic", "Noto Sans Arabic", "Noto Kufi Arabic", "DejaVu Sans", Arial, sans-serif;
+    font-size: 12pt;
     color: #333;
 }
 
+.auto-dir {
+    unicode-bidi: plaintext;
+}
+
+/* Header */
 .statement-header {
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 15px;
     margin-bottom: 20px;
 }
 
-.company-section {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.company-name {
-    font-size: 16pt;
-    margin: 0;
-    color: #2c3e50;
-}
-
-.statement-title {
-    font-size: 24pt;
-    font-weight: bold;
-    color: #5b7fa5;
-    margin: 0;
-}
-
-.bill-to-section {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-}
-
-.customer-info {
+/* Tables */
+.statement-page .tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
     margin-top: 10px;
-    line-height: 1.6;
+    margin-bottom: 12px;
 }
 
-.remittance-section {
-    margin-top: 20px;
-}
-
-.remittance-box {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 5px;
-}
-
-.remittance-box strong {
-    font-size: 11pt;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.small-text {
-    font-size: 8pt;
-    margin: 5px 0;
-    line-height: 1.4;
-}
-
-.remittance-address {
-    margin: 10px 0;
-    font-size: 9pt;
-}
-
-.statement-info {
-    margin-bottom: 20px;
-}
-
-.info-table {
-    border: none;
-    margin-bottom: 0;
-}
-
-.info-table td {
-    padding: 5px 10px;
-    border: none;
-}
-
-.info-value {
-    background-color: #f8f9fa;
-    padding: 5px 10px;
-    border: 1px solid #dee2e6;
-    min-width: 120px;
+.statement-page .tbl th {
+    background-color: #f7f7f7;
     text-align: center;
-}
-
-.account-summary {
-    margin-top: 20px;
-}
-
-.summary-box {
-    background-color: #e8f0f7;
-    border: 2px solid #5b7fa5;
-    border-radius: 5px;
-    padding: 15px;
-}
-
-.summary-header {
-    background-color: #5b7fa5;
-    color: white;
-    padding: 8px 15px;
-    margin: -15px -15px 15px -15px;
+    padding: 6px;
+    border: 1px solid #cfcfcf;
     font-weight: bold;
-    border-radius: 3px 3px 0 0;
+}
+
+.statement-page .tbl td {
+    padding: 6px;
+    border: 1px solid #cfcfcf;
+    vertical-align: middle;
+}
+
+.statement-page .text-right { text-align: right; }
+.statement-page .text-center { text-align: center; }
+.statement-page .nowrap { white-space: nowrap; }
+
+.statement-page .section-title {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 6px 8px;
+    margin: 14px 0 6px 0;
+    border: 1px solid #cfcfcf;
+    background-color: #f2f2f2;
+}
+
+.statement-page .muted {
+    color: #666666;
+}
+
+.statement-page .empty-row {
     text-align: center;
+    color: #666666;
+    font-style: italic;
+    padding: 10px 0;
 }
 
-.summary-box table {
-    margin-bottom: 10px;
+.statement-page .unit-sep {
+    border-top: 1px dashed #cfcfcf;
+    margin: 10px 0 0 0;
 }
 
-.summary-box td {
-    padding: 5px 10px;
-    border: none;
-}
-
-.balance-due {
-    font-size: 14pt;
-    font-weight: bold;
-    color: #c00;
-}
-
-.enclosed-amount {
-    border: 1px solid #333;
-    min-width: 100px;
-    display: inline-block;
-    padding: 5px;
-}
-
-.account-activity {
-    margin-top: 30px;
-}
-
-.activity-title {
-    background-color: #2c3e50;
-    color: white;
-    padding: 8px 15px;
-    margin-bottom: 0;
-    font-size: 12pt;
-    border-radius: 3px 3px 0 0;
-}
-
-.activity-table {
-    margin-top: 0;
-    font-size: 9pt;
-}
-
-.activity-table thead {
-    background-color: #E8F0F7;
-    color: white;
-}
-
-.activity-table th {
-    padding: 8px 5px;
-    font-weight: bold;
-    text-align: left;
-    border: 1px solid white;
-}
-
-.activity-table td {
-    padding: 6px 5px;
-    border: 1px solid #dee2e6;
-}
-
-.balance-forward-row {
-    background-color: #f8f9fa;
-    font-weight: bold;
-}
-
-.current-balance {
-    text-align: right;
-    font-size: 12pt;
-    padding: 10px 15px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-}
-
-.balance-amount {
-    font-size: 14pt;
-    font-weight: bold;
-    color: #c00;
-    margin-left: 20px;
-}
-
-.statement-footer {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #dee2e6;
-    font-size: 9pt;
-}
-
-.statement-footer p {
-    margin: 5px 0;
-}
-
-.statement-footer h4 {
-    font-size: 12pt;
-    color: #2c3e50;
-}
-
-/* Print-specific styles */
+/* Print */
 @media print {
     .statement-page {
         margin: 0;
         padding: 10px;
     }
-    
+
     .page-break {
         page-break-after: always;
     }

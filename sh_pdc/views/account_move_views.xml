@@ -5,115 +5,132 @@
     <record id="sh_move_form_inherit" model="ir.ui.view">
         <field name="name">Sh move form Inherit</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="inherit_id" ref="account.view_move_form" />
         <field name="arch" type="xml">
             <button name="action_register_payment" position="after">
                 <button name="%(sh_pdc_wizard_action)d" type="action" string="Register PDC Cheque"
-                        invisible="state != 'posted' or payment_state == 'paid' or move_type not in ('out_invoice','in_invoice')"
-                        groups="account.group_account_invoice" class="oe_highlight"/>
+                    invisible="state != 'posted' or payment_state == 'paid' or move_type not in ('out_invoice','in_invoice')"
+                    groups="account.group_account_invoice" class="oe_highlight" />
             </button>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="open_pdc_payment" class="oe_stat_button" type="object" icon="fa-credit-card"
-                        invisible="pdc_payment_count == 0">
-                    <field name="pdc_payment_count" widget="statinfo" string="PDC Payments"/>
+                <button name="open_pdc_payment" class="oe_stat_button" type="object"
+                    icon="fa-credit-card"
+                    invisible="pdc_payment_count == 0">
+                    <field name="pdc_payment_count" widget="statinfo" string="PDC Payments" />
                 </button>
             </xpath>
             <!-- Add rejection reason field -->
             <field name="narration" position="after">
                 <field name="rejection_reason" readonly="1" invisible="sh_pdc_status != 'rejected'"
-                       string="Rejection Reason" class="alert alert-danger"/>
+                    string="Rejection Reason" class="alert alert-danger" />
             </field>
             <xpath expr='//page[@name="other_info"]' position='after'>
                 <page name='pdc_payment' string='PDC Payment'>
                     <field name='pdc_payment_ids'>
                         <!-- UPDATED: Removed decoration-danger for bounced state -->
-                        <list decoration-success="state in ['done','cashed']" decoration-info="state == 'draft'"
-                              decoration-warning="state in ['return','replaced']"
-                              decoration-danger="state == 'rejected'" decoration-muted="state == 'cancel'">
-                            <field name="currency_id" column_invisible="1"/>
-                            <field name="payment_date"/>
-                            <field name="name"/>
-                            <field name="journal_id"/>
-                            <field name="partner_id"/>
-                            <field name="payment_amount"/>
-                            <field name="state"/>
-                            <field name="installment_no"/>
+                        <list decoration-success="state in ['done','cashed']"
+                            decoration-info="state == 'draft'"
+                            decoration-warning="state in ['return','replaced']"
+                            decoration-danger="state == 'rejected'"
+                            decoration-muted="state == 'cancel'">
+                            <field name="currency_id" column_invisible="1" />
+                            <field name="payment_date" />
+                            <field name="name" />
+                            <field name="journal_id" />
+                            <field name="partner_id" />
+                            <field name="payment_amount" />
+                            <field name="state" />
+                            <field name="installment_no" />
                         </list>
                         <form>
                             <header>
-                                <button name="action_register" class="oe_highlight" invisible="state != 'draft'"
-                                        string="Register" type="object"/>
+                                <button name="action_register" class="oe_highlight"
+                                    invisible="state != 'draft'"
+                                    string="Register" type="object" />
                                 <button name="action_deposited" class="oe_highlight"
-                                        invisible="state not in ('registered')" string="Deposit" type="object"/>
+                                    invisible="state not in ('registered')" string="Deposit"
+                                    type="object" />
                                 <!-- Return button moves to Return state -->
-                                <button name="action_returned" class="oe_highlight" invisible="state != 'deposited'"
-                                        string="Return" type="object"/>
+                                <button name="action_returned" class="oe_highlight"
+                                    invisible="state != 'deposited'"
+                                    string="Return" type="object" />
                                 <!-- NEW: Buttons in Return state -->
-                                <button name="action_reject" class="oe_highlight" invisible="state != 'return'"
-                                        string="Rejected" type="object"/>
-                                <button name="action_replace" invisible="state != 'return'" string="Replace"
-                                        type="object"/>
+                                <button name="action_reject" class="oe_highlight"
+                                    invisible="state != 'return'"
+                                    string="Rejected" type="object" />
+                                <button name="action_replace" invisible="state != 'return'"
+                                    string="Replace"
+                                    type="object" />
                                 <!-- Cashed button in Deposited state -->
-                                <button name="action_cashed" class="oe_highlight" invisible="state != 'deposited'"
-                                        string="Cashed" type="object"/>
+                                <button name="action_cashed" class="oe_highlight"
+                                    invisible="state != 'deposited'"
+                                    string="Cashed" type="object" />
                                 <!-- UPDATED: Done button works from deposited or cashed -->
                                 <button name="action_done" class="oe_highlight"
-                                        invisible="state not in ('deposited','cashed')" string="Done" type="object"/>
+                                    invisible="state not in ('deposited','cashed')" string="Done"
+                                    type="object" />
                                 <button name="action_cancel" class="oe_highlight"
-                                        invisible="state in ('registered','rejected','replaced','cancel')"
-                                        string="Cancel" type="object"/>
+                                    invisible="state in ('registered','rejected','replaced','cancel')"
+                                    string="Cancel" type="object" />
 
                                 <field name="state" widget="statusbar"
-                                       statusbar_visible="draft,registered,deposited,return,cashed,done"/>
+                                    statusbar_visible="draft,registered,deposited,return,cashed,done" />
                             </header>
                             <sheet>
                                 <div name="button_box" class="oe_button_box">
-                                    <button name="open_attachments" class="oe_stat_button" icon="fa-cloud-upload"
-                                            type="object" string="Attachments">
+                                    <button name="open_attachments" class="oe_stat_button"
+                                        icon="fa-cloud-upload"
+                                        type="object" string="Attachments">
                                     </button>
-                                    <button name="open_journal_items" class="oe_stat_button" icon="fa-list"
-                                            type="object" string="Journal Items">
+                                    <button name="open_journal_items" class="oe_stat_button"
+                                        icon="fa-list"
+                                        type="object" string="Journal Items">
                                     </button>
-                                    <button name="open_journal_entry" class="oe_stat_button" icon="fa-list"
-                                            type="object" string="Journal Entry">
+                                    <button name="open_journal_entry" class="oe_stat_button"
+                                        icon="fa-list"
+                                        type="object" string="Journal Entry">
                                     </button>
                                 </div>
 
                                 <group>
                                     <group>
-                                        <field name="name" readonly="1"/>
+                                        <field name="name" readonly="1" />
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
-                                        <field name="payment_type" readonly="state not in ['draft']" widget="radio"/>
-                                        <field name="currency_id" invisible="1"/>
+                                        <field name="payment_type" readonly="state not in ['draft']"
+                                            widget="radio" />
+                                        <field name="currency_id" invisible="1" />
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
-                                        <field name="partner_id" readonly="state not in ['draft']"/>
+                                        <field name="partner_id" readonly="state not in ['draft']" />
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
                                         <field name="payment_amount" widget="monetary"
-                                               readonly="state not in ['draft']"/>
+                                            readonly="state not in ['draft']" />
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
-                                        <field name="reference" readonly="state not in ['draft']"/>
-                                        <!-- UPDATED: Allow editing in registered and deposited states -->
-                                        <field name="journal_id" options="{'no_create':1,'no_create_edit':1}"
-                                               readonly="state not in ['draft','registered','deposited']"/>
+                                        <field name="reference" readonly="state not in ['draft']" />
+                                        <!-- UPDATED: Allow editing in registered and deposited
+                                        states -->
+                                        <field name="journal_id"
+                                            options="{'no_create':1,'no_create_edit':1}"
+                                            readonly="state not in ['draft','registered','deposited']" />
                                     </group>
                                     <group>
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
-                                        <field name="payment_date" readonly="state not in ['draft']"/>
+                                        <field name="payment_date" readonly="state not in ['draft']" />
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
-                                        <field name="due_date" readonly="state not in ['draft']"/>
+                                        <field name="due_date" readonly="state not in ['draft']" />
                                         <!-- UPDATED: Allow editing in deposited state -->
-                                        <field name="deposited_date" readonly="state not in ['draft','deposited']"/>
+                                        <field name="deposited_date"
+                                            readonly="state not in ['draft','deposited']" />
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
-                                        <field name="memo" readonly="state not in ['draft']"/>
+                                        <field name="memo" readonly="state not in ['draft']" />
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
-                                        <field name="agent" readonly="state not in ['draft']"/>
+                                        <field name="agent" readonly="state not in ['draft']" />
                                         <!-- UPDATED: Removed 'bounced' from readonly condition -->
-                                        <field name="bank_id" readonly="state not in ['draft']"/>
+                                        <field name="bank_id" readonly="state not in ['draft']" />
                                     </group>
                                 </group>
                                 <notebook>
                                     <page string="Attachments">
-                                        <field name="attachment_ids" widget="many2many_binary"/>
+                                        <field name="attachment_ids" widget="many2many_binary" />
                                     </page>
                                 </notebook>
                             </sheet>
@@ -121,21 +138,23 @@
                     </field>
 
                     <group class="oe_subtotal_footer">
-                        <field name="total_pdc_received"/>
-                        <field name="total_pdc_pending"/>
-                        <field name="total_pdc_cancel" invisible="total_pdc_cancel == 0.0"/>
-                        <field name="total_pdc_payment" class="oe_subtotal_footer_separator"/>
+                        <field name="total_pdc_received" />
+                        <field name="total_pdc_pending" />
+                        <field name="total_pdc_cancel" invisible="total_pdc_cancel == 0.0" />
+                        <field name="total_pdc_payment" class="oe_subtotal_footer_separator" />
                     </group>
 
                 </page>
             </xpath>
             <field name="payment_reference" position="after">
-                <field name="is_boolean" invisible="1"/>
+                <field name="is_boolean" invisible="1" />
 
             </field>
             <xpath expr="//sheet//widget[2]" position="attributes">
-                <attribute name="invisible">not is_boolean and (payment_state != 'in_payment' or move_type not in
-                    ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))
+                <attribute name="invisible">not is_boolean and (payment_state != 'in_payment' or
+                    move_type not in
+                    ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt',
+                    'in_receipt'))
                 </attribute>
             </xpath>
         </field>
@@ -143,22 +162,22 @@
     <record id="sh_out_invoice_tree_view" model="ir.ui.view">
         <field name="name">account.move</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="inherit_id" ref="account.view_invoice_tree" />
         <field name="arch" type="xml">
             <field name="status_in_payment" position="after">
                 <field name="sh_pdc_status" widget="badge" optional="show"
-                       decoration-success="sh_pdc_status in ['deposited','cashed']"
-                       decoration-info="sh_pdc_status == 'draft' or sh_pdc_status == 'registered'"
-                       decoration-warning="sh_pdc_status in ['return','replaced']"
-                       decoration-danger="sh_pdc_status in ['rejected','cancel']"
-                       decoration-muted="sh_pdc_status == 'registered'"/>
+                    decoration-success="sh_pdc_status in ['deposited','cashed']"
+                    decoration-info="sh_pdc_status == 'draft' or sh_pdc_status == 'registered'"
+                    decoration-warning="sh_pdc_status in ['return','replaced']"
+                    decoration-danger="sh_pdc_status in ['rejected','cancel']"
+                    decoration-muted="sh_pdc_status == 'registered'" />
             </field>
         </field>
     </record>
     <record model="ir.actions.server" id="action_update_pdc_status">
         <field name="name">Update Latest PDC Status</field>
-        <field name="model_id" ref="account.model_account_move"/>
-        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="model_id" ref="account.model_account_move" />
+        <field name="binding_model_id" ref="account.model_account_move" />
         <field name="state">code</field>
         <field name="binding_view_types">tree,form</field>
         <field name="code">

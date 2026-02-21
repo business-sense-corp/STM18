@@ -3,250 +3,401 @@
 
     <template id="statement_report_template">
         <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <div class="page" style="font-size:12px;">
+            <t t-call="web.basic_layout">
 
-                    <!-- HEADER -->
-                    <table style="width:100%; margin-bottom:15px;">
-                        <tr>
-                            <td style="width:70%;">
-                                <t t-if="company.logo">
-                                    <img t-att-src="image_data_uri(company.logo)"
-                                        style="max-height:100px;" />
-                                </t>
-                                <br />
-                                <div>
-                                    <strong>
-                                        <span t-field="company.name" />
-                                    </strong>
-                                </div>
-                                <div>
-                                    <span t-field="company.street" />
-                                </div>
-                                <div>
-                                    <span t-field="company.city" />
-                                </div>
-                                <div>
-                                    <strong>Phone:</strong>
-                                    <span t-field="company.phone" />
-                                </div>
+                <t t-foreach="docs" t-as="o">
+                    <div class="page" style="font-size:12px;">
 
-                                <!-- CUSTOMER -->
-                                <t t-if="docs">
-                                    <h3>Customer Information</h3>
+                        <style>
+                            .page{
+                            font-family: "Noto Naskh Arabic","Noto Sans Arabic","Noto Kufi
+                            Arabic","DejaVu Sans", Arial, sans-serif;
+                            }
+                            .auto-dir{ unicode-bidi: plaintext; }
+
+                            .header-table, .header-table *{
+                            border: 0 !important;
+                            outline: 0 !important;
+                            box-shadow: none !important;
+                            }
+                            .header-table{
+                            border-collapse: collapse !important;
+                            border-spacing: 0 !important;
+                            }
+                            .header-table td, .header-table th{ border: 0 !important; }
+
+                            .units-block h1, .units-block h2, .units-block h3, .units-block h4,
+                            .units-block p { margin: 0; padding: 0; }
+                            .units-block table { margin: 0; }
+
+                            .units-title{
+                            margin: 14px 0 10px 0;
+                            text-align:center;
+                            font-size: 18px;
+                            font-weight: 700;
+                            letter-spacing: .2px;
+                            }
+
+                            .units-block .tbl{
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 10.5px;
+                            }
+                            .units-block .tbl th{
+                            background: #f3f5f7;
+                            text-align: center;
+                            padding: 7px 6px;
+                            border: 1px solid #d7d7d7;
+                            font-weight: 700;
+                            }
+                            .units-block .tbl td{
+                            padding: 7px 6px;
+                            border: 1px solid #d7d7d7;
+                            vertical-align: middle;
+                            }
+
+                            .text-right{ text-align:right; }
+                            .text-center{ text-align:center; }
+                            .nowrap{ white-space: nowrap; }
+
+                            .unit-card{
+                            border: 1px solid #d7d7d7;
+                            border-radius: 6px;
+                            padding: 10px 10px 6px 10px;
+                            margin: 10px 0 12px 0;
+                            background: #fff;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                            }
+
+                            .section-title{
+                            font-size: 12px;
+                            font-weight: 700;
+                            padding: 8px 10px;
+                            margin: 0 0 8px 0;
+                            border: 1px solid #d7d7d7;
+                            border-radius: 6px;
+                            background: #f7f7f7;
+                            }
+                            .muted{ color:#666; font-weight:400; }
+
+                            .empty-row{
+                            text-align:center;
+                            color:#666;
+                            font-style: italic;
+                            padding: 10px 0;
+                            }
+
+                            .summary-card{
+                            margin-top: 8px;
+                            border: 1px solid #d7d7d7;
+                            border-radius: 6px;
+                            overflow: hidden;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                            }
+                            .summary-head{
+                            background:#f3f5f7;
+                            font-weight:700;
+                            text-align:center;
+                            padding: 6px 8px;
+                            border-bottom: 1px solid #d7d7d7;
+                            }
+                            .summary-grid{
+                            width:100%;
+                            border-collapse: collapse;
+                            font-size: 10.5px;
+                            }
+                            .summary-grid td{
+                            border-right: 1px solid #d7d7d7;
+                            border-bottom: 1px solid #d7d7d7;
+                            padding: 7px 8px;
+                            vertical-align: middle;
+                            }
+                            .summary-grid tr:last-child td{ border-bottom: 0; }
+                            .summary-grid td:last-child{ border-right: 0; }
+
+                            .k{ color:#555; font-weight:700; }
+                            .v{ font-weight:700; }
+
+                            table { page-break-inside: auto; }
+                            tr { page-break-inside: avoid; page-break-after: auto; }
+
+                            /* FORCE REMOVE THEME BLACK BORDERS */
+                            .unit-card,
+                            .unit-card *,
+                            .units-block table,
+                            .units-block th,
+                            .units-block td,
+                            .summary-card,
+                            .summary-card *,
+                            .summary-grid,
+                            .summary-grid td {
+                            border-color: #d7d7d7 !important;
+                            }
+
+                            /* Ensure outer cards are clean and consistent */
+                            .unit-card,
+                            .summary-card {
+                            border: 1px solid #d7d7d7 !important;
+                            }
+
+                        </style>
+
+                        <!-- HEADER -->
+                        <table class="header-table"
+                            style="width:100%; margin-bottom:15px; border:0 !important;">
+                            <tr>
+                                <td style="width:70%; border:0 !important;">
+                                    <t t-if="company.logo">
+                                        <img t-att-src="image_data_uri(company.logo)"
+                                            style="max-height:100px;" />
+                                    </t>
+                                    <br />
                                     <div>
-                                        <strong>Name:</strong>
-                                        <span t-field="o.name" />
+                                        <strong>
+                                            <span class="auto-dir" t-field="company.name" />
+                                        </strong>
                                     </div>
                                     <div>
-                                        <strong>Address:</strong>
-                                        <span t-field="o.street" />
+                                        <span class="auto-dir" t-field="company.street" />
+                                    </div>
+                                    <div>
+                                        <span class="auto-dir" t-field="company.city" />
                                     </div>
                                     <div>
                                         <strong>Phone:</strong>
-                                        <span t-field="o.phone" />
+                                        <span class="auto-dir" t-field="company.phone" />
+                                    </div>
+
+                                    <!-- CUSTOMER -->
+                                    <t t-if="docs">
+                                        <h3 style="margin-top:10px;">Customer Information</h3>
+                                        <div>
+                                            <strong>Name:</strong>
+                                            <span class="auto-dir" t-field="o.name" />
+                                        </div>
+                                        <div>
+                                            <strong>Address:</strong>
+                                            <span class="auto-dir" t-field="o.street" />
+                                        </div>
+                                        <div>
+                                            <strong>Phone:</strong>
+                                            <span class="auto-dir" t-field="o.phone" />
+                                        </div>
+                                        <div>
+                                            <strong>Email:</strong>
+                                            <span class="auto-dir" t-field="o.email" />
+                                        </div>
+                                    </t>
+                                </td>
+
+                                <td style="width:30%; border:0 !important;">
+                                    <h2 style="margin-bottom:5px;">Account Statement</h2>
+                                    <div>
+                                        <strong>Date:</strong>
+                                        <span t-esc="statement_date" />
+                                    </div>
+
+                                    <br />
+
+                                    <!-- PAYMENTS SUMMARY (OVERALL) -->
+                                    <div>
+                                        <strong>Collected Amount:</strong>
+                                        <span t-esc="collected_amount" />
                                     </div>
                                     <div>
-                                        <strong>Email:</strong>
-                                        <span t-field="o.email" />
+                                        <strong>Outstanding Amount:</strong>
+                                        <span t-esc="outstanding_amount" />
                                     </div>
-                                </t>
-                            </td>
-
-                            <td style="width:30%;">
-                                <h2 style="margin-bottom:5px;">Account Statement</h2>
-                                <div>
-                                    <strong>Date:</strong>
-                                    <span t-esc="statement_date" />
-                                </div>
-
-                                <br />
-
-                                <!-- PAYMENTS SUMMARY -->
-                                <div>
-                                    <strong>Collected Amount:</strong>
-                                    <span t-esc="collected_amount" />
-                                </div>
-                                <div>
-                                    <strong>Outstanding Amount:</strong>
-                                    <span t-esc="outstanding_amount" />
-                                </div>
-                                <div>
-                                    <strong>Total No of Cheques:</strong>
-                                    <span t-esc="total_cheques" />
-                                </div>
-                                <div>
-                                    <strong>Collected:</strong>
-                                    <span t-esc="cheques_collected" />
-                                </div>
-                                <div>
-                                    <strong>Rejected:</strong>
-                                    <span t-esc="cheques_rejected" />
-                                </div>
-                                <div>
-                                    <strong>Remaining:</strong>
-                                    <span t-esc="cheques_remaining" />
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-
-
-                    <!-- UNITS INFORMATION (NEW)   -->
-                    <style>
-                        .tbl {
-                        width: 100%;
-                        border-collapse: collapse;
-                        font-size: 11px;
-                        }
-                        .tbl th {
-                        background: #f7f7f7;
-                        text-align: center;
-                        padding: 6px;
-                        border: 1px solid #cfcfcf;
-                        font-weight: 700;
-                        }
-                        .tbl td {
-                        padding: 6px;
-                        border: 1px solid #cfcfcf;
-                        vertical-align: middle;
-                        }
-                        .text-right { text-align: right; }
-                        .text-center { text-align: center; }
-                        .nowrap { white-space: nowrap; }
-
-                        .section-title {
-                        font-size: 12px;
-                        font-weight: 700;
-                        text-align: left;
-                        padding: 6px 8px;
-                        margin: 14px 0 6px 0;
-                        border: 1px solid #cfcfcf;
-                        background: #f2f2f2;
-                        }
-                        .muted {
-                        color: #666;
-                        font-weight: 400;
-                        }
-                        .empty-row {
-                        text-align: center;
-                        color: #666;
-                        font-style: italic;
-                        padding: 10px 0;
-                        }
-                        .unit-sep {
-                        border-top: 1px dashed #cfcfcf;
-                        margin: 10px 0 0 0;
-                        }
-                    </style>
-
-                    <h3 style="margin-top:15px; text-align:center;">Units Information</h3>
-                    <t t-if="units">
-                        <table class="tbl" style="margin-top:10px; margin-bottom:12px;">
-                            <thead>
-                                <tr>
-                                    <th class="nowrap">Unit Name</th>
-                                    <th>Unit Category</th>
-                                    <th class="nowrap">Unit Type</th>
-                                    <th class="nowrap">Project</th>
-                                    <th class="nowrap">Unit Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <t t-foreach="units" t-as="u">
-                                    <tr>
-                                        <td class="nowrap">
-                                            <span t-field="u['unit_product'].name" />
-                                        </td>
-                                        <td>
-                                            <span t-field="u['unit_product'].categ_id" />
-                                        </td>
-                                        <td class="nowrap">
-                                            <span t-field="u['unit_product'].project_type" />
-                                        </td>
-                                        <td class="nowrap">
-                                            <span t-field="u['unit_product'].project_location" />
-                                        </td>
-                                        <td class="text-right nowrap">
-                                            <span t-esc="u['unit_amount']" />
-                                        </td>
-                                    </tr>
-                                </t>
-                            </tbody>
+                                    <div>
+                                        <strong>Total No of Cheques:</strong>
+                                        <span t-esc="total_cheques" />
+                                    </div>
+                                    <div>
+                                        <strong>Collected:</strong>
+                                        <span t-esc="cheques_collected" />
+                                    </div>
+                                    <div>
+                                        <strong>Rejected:</strong>
+                                        <span t-esc="cheques_rejected" />
+                                    </div>
+                                    <div>
+                                        <strong>Remaining:</strong>
+                                        <span t-esc="cheques_remaining" />
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
 
-                        <!-- (2) Assignments/Installments -->
-                        <t t-foreach="units" t-as="u">
-                            <div class="section-title"> Installments / Assignments - <span
-                                    t-esc="u['unit_product'].name" />
-                                <span class="muted"> (Count: <span
-                                        t-esc="len(u['installments'])" />) </span>
-                            </div>
-                            <table class="tbl" style="margin-bottom:14px;">
-                                <thead>
-                                    <tr>
-                                        <th class="nowrap">Payment Date</th>
-                                        <th class="nowrap">Name</th>
-                                        <th class="nowrap">Payment Journal</th>
-                                        <th>Partner</th>
-                                        <th class="nowrap">Payment Amount</th>
-                                        <th class="nowrap">Due Date</th>
-                                        <th class="nowrap">Installment No.</th>
-                                        <th class="nowrap">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-if="u['installments']">
-                                        <t t-foreach="u['installments']" t-as="l">
+                        <!-- UNITS INFORMATION -->
+                        <div class="units-block">
+
+                            <div class="units-title">Units Information</div>
+
+                            <t t-if="units">
+
+                                <!-- Units table -->
+                                <table class="tbl" style="margin-top:6px; margin-bottom:12px;">
+                                    <thead>
+                                        <tr>
+                                            <th class="nowrap">Unit Name</th>
+                                            <th>Unit Category</th>
+                                            <th class="nowrap">Unit Type</th>
+                                            <th class="nowrap">Project</th>
+                                            <th class="nowrap">Unit Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="units" t-as="u">
                                             <tr>
                                                 <td class="nowrap">
-                                                    <span
-                                                        t-esc="l.payment_date.strftime('%d/%m/%Y') if l.payment_date else ''" />
+                                                    <span class="auto-dir"
+                                                        t-field="u['unit_product'].name" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="u['unit_product'].categ_id" />
                                                 </td>
                                                 <td class="nowrap">
-                                                    <span t-field="l.name" />
+                                                    <span t-field="u['unit_product'].project_type" />
                                                 </td>
                                                 <td class="nowrap">
-                                                    <span
-                                                        t-esc="l.journal_id.with_context(lang='en_US').name" />
-                                                </td>
-                                                <td class="nowrap">
-                                                    <span t-field="l.partner_id" />
+                                                    <span class="auto-dir"
+                                                        t-field="u['unit_product'].project_location" />
                                                 </td>
                                                 <td class="text-right nowrap">
-                                                    <span t-field="l.payment_amount" />
-                                                </td>
-                                                <td class="nowrap">
-                                                    <span
-                                                        t-esc="l.due_date.strftime('%d/%m/%Y') if l.due_date else ''" />
-                                                </td>
-                                                <td class="text-center nowrap">
-                                                    <span t-esc="l.installment_no" />
-                                                </td>
-                                                <td class="text-center nowrap">
-                                                    <span t-esc="l.state" />
+                                                    <span t-esc="u['unit_amount']" />
                                                 </td>
                                             </tr>
                                         </t>
-                                    </t>
-                                    <t t-if="not u['installments']">
-                                        <tr>
-                                            <td colspan="8" class="empty-row">
-                                                No assignments/installments found for this unit.
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
-                            <div class="unit-sep"></div>
-                        </t>
-                    </t>
-                    <t t-if="not units">
-                        <p style="text-align:center; margin-top:20px; color:#666;">
-                            No units found.
-                        </p>
-                    </t>
-                </div>
+                                    </tbody>
+                                </table>
+
+                                <!-- Installments per unit -->
+                                <t t-foreach="units" t-as="u">
+                                    <div class="unit-card">
+
+                                        <div class="section-title"> Installments / Assignments - <span
+                                                class="auto-dir" t-esc="u['unit_product'].name" />
+                                            <span
+                                                class="muted"> (Count: <span
+                                                    t-esc="len(u['installments'])" />) </span>
+                                        </div>
+
+                                        <table class="tbl" style="margin-bottom:6px;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="nowrap">Payment Date</th>
+                                                    <th class="nowrap">Name</th>
+                                                    <th class="nowrap">Payment Journal</th>
+                                                    <th>Partner</th>
+                                                    <th class="nowrap">Payment Amount</th>
+                                                    <th class="nowrap">Due Date</th>
+                                                    <th class="nowrap">Installment No.</th>
+                                                    <th class="nowrap">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-if="u['installments']">
+                                                    <t t-foreach="u['installments']" t-as="l">
+                                                        <tr>
+                                                            <td class="nowrap">
+                                                                <span
+                                                                    t-esc="l.payment_date.strftime('%d/%m/%Y') if l.payment_date else ''" />
+                                                            </td>
+                                                            <td class="nowrap">
+                                                                <span class="auto-dir"
+                                                                    t-field="l.name" />
+                                                            </td>
+                                                            <td class="nowrap">
+                                                                <span
+                                                                    t-esc="l.journal_id.with_context(lang='en_US').name" />
+                                                            </td>
+                                                            <td class="nowrap">
+                                                                <span class="auto-dir"
+                                                                    t-field="l.partner_id" />
+                                                            </td>
+                                                            <td class="text-right nowrap">
+                                                                <span t-field="l.payment_amount" />
+                                                            </td>
+                                                            <td class="nowrap">
+                                                                <span
+                                                                    t-esc="l.due_date.strftime('%d/%m/%Y') if l.due_date else ''" />
+                                                            </td>
+                                                            <td class="text-center nowrap">
+                                                                <span t-esc="l.installment_no" />
+                                                            </td>
+                                                            <td class="text-center nowrap">
+                                                                <span t-esc="l.state" />
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </t>
+
+                                                <t t-if="not u['installments']">
+                                                    <tr>
+                                                        <td colspan="8" class="empty-row">
+                                                            No assignments/installments found for
+                                                            this unit.
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+
+                                        <!-- CHEQUES SUMMARY PER UNIT -->
+                                        <t t-set="cs" t-value="u.get('cheque_summary') or {}" />
+
+                                        <t t-if="cs.get('total', 0) > 0">
+                                            <div class="summary-card">
+                                                <div class="summary-head">Cheques Summary</div>
+
+                                                <table class="summary-grid">
+                                                    <tr>
+                                                        <td class="k">Collected Amount</td>
+                                                        <td class="v text-right nowrap">
+                                                            <span
+                                                                t-esc="cs.get('collected_amount', 0.0)" />
+                                                        </td>
+                                                        <td class="k">Remaining Amount</td>
+                                                        <td class="v text-right nowrap">
+                                                            <span
+                                                                t-esc="cs.get('remaining_amount', 0.0)" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="k">Total Cheques</td>
+                                                        <td class="v text-center nowrap">
+                                                            <span t-esc="cs.get('total', 0)" />
+                                                        </td>
+                                                        <td class="k">Collected / Rejected /
+                                                            Remaining</td>
+                                                        <td class="v text-center nowrap">
+                                                            <span t-esc="cs.get('collected', 0)" />
+                                                            / <span t-esc="cs.get('rejected', 0)" />
+                                                            / <span t-esc="cs.get('remaining', 0)" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </t>
+
+                                    </div>
+                                </t>
+
+                            </t>
+
+                            <t t-if="not units">
+                                <p style="text-align:center; margin-top:20px; color:#666;">
+                                    No units found.
+                                </p>
+                            </t>
+
+                        </div>
+
+                    </div>
+                </t>
+
             </t>
         </t>
     </template>

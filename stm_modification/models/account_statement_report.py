@@ -5,8 +5,6 @@ from datetime import datetime
 from collections import defaultdict
 
 
-
-
 class AccountStatementReport(models.AbstractModel):
     _name = 'report.stm_modification.statement_report_template'
     _description = 'Account Statement Report'
@@ -26,7 +24,6 @@ class AccountStatementReport(models.AbstractModel):
             date_to = datetime.strptime(date_to, '%Y-%m-%d').date()
 
         company = self.env.company
-
         partner = self.env['res.partner'].browse(partner_id) if partner_id else self.env['res.partner']
 
         account_lines = self._get_account_lines(partner_id, date_from, date_to) if partner_id else []
@@ -34,10 +31,10 @@ class AccountStatementReport(models.AbstractModel):
         current_balance = self._get_balance_due(partner_id, date_to) if partner_id else 0.0
 
         # ======================
-        # UNITS + INSTALLMENTS (NEW)
+        # UNITS + INSTALLMENTS
         # ======================
         units = []
-        all_installments = self.env['pdc.wizard']  
+        all_installments = self.env['pdc.wizard']
 
         line_domain = [
             ('move_id.move_type', '=', 'out_invoice'),
@@ -64,6 +61,7 @@ class AccountStatementReport(models.AbstractModel):
             'unit_product': self.env['product.product'],
             'unit_amount': 0.0,
             'installments': self.env['pdc.wizard'],
+            'cheque_summary': {},
         })
 
         for line in invoice_lines:
@@ -72,23 +70,48 @@ class AccountStatementReport(models.AbstractModel):
 
             if not g['unit_product']:
                 g['unit_product'] = unit
-                g['unit_amount'] = line.price_unit  
+                g['unit_amount'] = line.price_unit
 
             inst = line.move_id.pdc_payment_ids
             if inst:
                 g['installments'] |= inst
 
         for _, g in grouped.items():
-            if g['unit_product']:
-                units.append(g)
-                all_installments |= g['installments']
+            if not g['unit_product']:
+                continue
+
+            inst = g['installments']
+            total = len(inst)
+
+            collected_rs = inst.filtered(lambda c: c.state in ['done', 'cashed'])
+            rejected_rs = inst.filtered(lambda c: c.state == 'cancel')
+            remaining_rs = inst - collected_rs - rejected_rs
+
+            collected_count = len(collected_rs)
+            rejected_count = len(rejected_rs)
+            remaining_count = len(remaining_rs)
+
+            collected_amount_unit = sum(collected_rs.mapped('payment_amount')) if total else 0.0
+            remaining_amount_unit = sum(remaining_rs.mapped('payment_amount')) if total else 0.0
+
+            g['cheque_summary'] = {
+                'total': total,
+                'collected': collected_count,
+                'rejected': rejected_count,
+                'remaining': remaining_count,
+                'collected_amount': collected_amount_unit,
+                'remaining_amount': remaining_amount_unit,
+            }
+
+            units.append(g)
+            all_installments |= inst
 
         # ======================
         # SUMMARY (overall)
         # ======================
         total_cheques = len(all_installments)
         cheques_collected = len(all_installments.filtered(lambda c: c.state in ['done', 'cashed'])) if total_cheques else 0
-        collected_amount = sum(all_installments.filtered(lambda c: c.state in ['done', 'cashed']).mapped('payment_amount')) if total_cheques else 0
+        collected_amount = sum(all_installments.filtered(lambda c: c.state in ['done', 'cashed']).mapped('payment_amount')) if total_cheques else 0.0
         cheques_rejected = len(all_installments.filtered(lambda c: c.state == 'cancel')) if total_cheques else 0
         cheques_remaining = total_cheques - cheques_collected
 
@@ -105,6 +128,7 @@ class AccountStatementReport(models.AbstractModel):
             'balance_forward': balance_forward,
             'current_balance': current_balance,
             'units': units,
+
             'collected_amount': collected_amount,
             'outstanding_amount': current_balance if partner_id else 0.0,
             'total_cheques': total_cheques,
@@ -113,7 +137,6 @@ class AccountStatementReport(models.AbstractModel):
             'cheques_remaining': cheques_remaining,
         }
 
-    # =====================================================
     def _get_account_lines(self, partner_id, date_from, date_to):
         if not partner_id:
             return []
