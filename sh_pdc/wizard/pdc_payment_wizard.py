@@ -17,27 +17,6 @@ class PDCWizard(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _description = "PDC Wizard"
 
-    # _sql_constraints = [
-    #     ('reference_unique', 'UNIQUE(reference)',
-    #      'Cheque reference must be unique! This reference already exists in the system.')
-    # ]
-
-    # @api.constrains('reference')
-    # def _check_reference_unique(self):
-    #     for record in self:
-    #         if not record.reference:
-    #             continue
-
-    #         existing = self.search([
-    #             ('reference', '=', record.reference),
-    #             ('id', '!=', record.id)
-    #         ], limit=1)
-
-    #         if existing:
-    #             raise ValidationError(
-    #                 "Cheque reference must be unique! This reference already exists in the system."
-    #             )
-
 
 
     def _check_reference_ready(self):
@@ -54,36 +33,56 @@ class PDCWizard(models.Model):
 
         return super().unlink()
 
+    # @api.constrains('reference')
+    # def _check_unique_reference(self):
+    #     """Check that cheque reference is unique and not used as old reference"""
+    #     for record in self:
+    #         if not record.reference or record.reference.strip() == '/':
+    #             continue
+
+    #         duplicate = self.search([
+    #             ('reference', '=', record.reference),
+    #             ('id', '!=', record.id)
+    #         ], limit=1)
+
+    #         if duplicate:
+    #             raise ValidationError(
+    #                 f"Cheque reference '{record.reference}' already exists!\n"
+    #                 f"Duplicate found in PDC: {duplicate.name}\n"
+    #                 f"Please use a different cheque reference number."
+    #             )
+
+    #         old_duplicate = self.search([
+    #             ('old_reference', '=', record.reference),
+    #             ('id', '!=', record.id)
+    #         ], limit=1)
+
+    #         if old_duplicate:
+    #             raise ValidationError(
+    #                 f"Cheque reference '{record.reference}' was previously used!\n"
+    #                 f"This reference was used before in PDC: {old_duplicate.name}\n"
+    #                 f"Please use a different cheque reference number."
+    #             )
+
     @api.constrains('reference')
-    def _check_unique_reference(self):
-        """Check that cheque reference is unique and not used as old reference"""
+    def _check_reference_not_old_reference(self):
         for record in self:
-            if not record.reference or record.reference.strip() == '/':
+            ref = (record.reference or '').strip()
+            if not ref or ref == '/':
                 continue
 
-            duplicate = self.search([
-                ('reference', '=', record.reference),
-                ('id', '!=', record.id)
-            ], limit=1)
-
-            if duplicate:
-                raise ValidationError(
-                    f"Cheque reference '{record.reference}' already exists!\n"
-                    f"Duplicate found in PDC: {duplicate.name}\n"
-                    f"Please use a different cheque reference number."
-                )
-
             old_duplicate = self.search([
-                ('old_reference', '=', record.reference),
+                ('old_reference', '=', ref),
                 ('id', '!=', record.id)
             ], limit=1)
 
             if old_duplicate:
                 raise ValidationError(
-                    f"Cheque reference '{record.reference}' was previously used!\n"
-                    f"This reference was used before in PDC: {old_duplicate.name}\n"
-                    f"Please use a different cheque reference number."
+                    "This cheque reference was used before (as an old reference) "
+                    f"in PDC: {old_duplicate.name}. Please use a different number."
                 )
+
+
 
     def action_register_check(self):
         active_ids = self.env.context.get('active_ids')
