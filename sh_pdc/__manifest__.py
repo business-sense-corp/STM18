@@ -13,7 +13,7 @@
  Manage Post Dated Cheque App, View Vendor Invoice PDC , List Of Customer PDC Payment, Track Client PDC Process, Register Vendor Post Dated Cheque Module, Print VendorPDC Report, Print Client PDC Report Odoo.""",
     "version": "0.0.4",
     "depends": [
-        "account"
+        "account",
     ],
     "data": [
         "data/ir_sequence.xml",

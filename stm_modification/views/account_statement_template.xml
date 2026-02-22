@@ -307,7 +307,7 @@
                                                             </td>
                                                             <td class="nowrap">
                                                                 <span class="auto-dir"
-                                                                    t-field="l.name" />
+                                                                    t-field="l.reference" />
                                                             </td>
                                                             <td class="nowrap">
                                                                 <span
