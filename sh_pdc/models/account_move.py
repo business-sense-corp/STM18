@@ -24,8 +24,8 @@ class AccountInvoice(models.Model):
             rec.pdc_payment_count = len(self.pdc_payment_ids)
 
     pdc_id = fields.Many2one('pdc.wizard')
-    pdc_payment_ids = fields.Many2many(
-        'pdc.wizard', compute='_compute_pdc_payment_invoice')
+    # pdc_payment_ids = fields.Many2many(
+    #     'pdc.wizard', compute='_compute_pdc_payment_invoice')
     pdc_payment_count = fields.Integer(
         "Pdc payment count", compute='_compute_pdc_payment')
     total_pdc_payment = fields.Monetary("Total ", compute='_compute_total_pdc')
@@ -39,6 +39,19 @@ class AccountInvoice(models.Model):
     # NEW: Rejection reason field
     rejection_reason = fields.Text(
         "Rejection Reason", compute='_compute_rejection_reason', store=True, readonly=True)
+    pdc_payment_ids = fields.Many2many(
+        'pdc.wizard',
+        compute='_compute_pdc_payment_invoice',
+        search='_search_pdc_payment_ids'  # ← أضف ده
+    )
+
+    def _search_pdc_payment_ids(self, operator, value):
+        pdcs = self.env['pdc.wizard'].search([('id', operator, value)])
+        move_ids = pdcs.mapped('invoice_id').ids
+        move_ids += self.env['account.move'].search([
+            ('id', 'in', pdcs.mapped('invoice_ids').ids)
+        ]).ids
+        return [('id', 'in', list(set(move_ids)))]
 
     # UPDATED: Includes all new states (return, rejected, replaced, cashed)
     sh_pdc_status = fields.Selection([

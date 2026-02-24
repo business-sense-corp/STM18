@@ -14,6 +14,7 @@
     "version": "0.0.4",
     "depends": [
         "account",
+        "purchase_stock",
     ],
     "data": [
         "data/ir_sequence.xml",
