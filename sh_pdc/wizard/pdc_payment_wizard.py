@@ -35,23 +35,23 @@ class PDCWizard(models.Model):
 
 
 
-    @api.constrains('reference')
-    def _check_reference_not_old_reference(self):
-        for record in self:
-            ref = (record.reference or '').strip()
-            if not ref or ref == '/':
-                continue
-
-            old_duplicate = self.search([
-                ('old_reference', '=', ref),
-                ('id', '!=', record.id)
-            ], limit=1)
-
-            if old_duplicate:
-                raise ValidationError(
-                    "This cheque reference was used before (as an old reference) "
-                    f"in PDC: {old_duplicate.name}. Please use a different number."
-                )
+    # @api.constrains('reference')
+    # def _check_reference_not_old_reference(self):
+    #     for record in self:
+    #         ref = (record.reference or '').strip()
+    #         if not ref or ref == '/':
+    #             continue
+    #
+    #         old_duplicate = self.search([
+    #             ('old_reference', '=', ref),
+    #             ('id', '!=', record.id)
+    #         ], limit=1)
+    #
+    #         if old_duplicate:
+    #             raise ValidationError(
+    #                 "This cheque reference was used before (as an old reference) "
+    #                 f"in PDC: {old_duplicate.name}. Please use a different number."
+    #             )
 
 
 
