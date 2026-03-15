@@ -3,7 +3,11 @@ name: Deploy to Ubuntu Server
 on:
   push:
     branches:
+
+      - staging   # change if your branch is different
+
       - main   # change if your branch is different
+
 
 jobs:
   deploy:
@@ -15,4 +19,8 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+
+          script: cd projects/stm/staging/addons/custom/ && git pull && cd ../.. && docker-compose restart
+
           script: cd projects/stm/live/addons/custom/ && git pull && cd ../.. && docker-compose restart
+

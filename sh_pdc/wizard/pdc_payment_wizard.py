@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# Part of Softhealer Technologies.
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.http import request
@@ -17,7 +15,23 @@ class PDCWizard(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _description = "PDC Wizard"
 
+    effective_invoice_amount = fields.Monetary(
+    string="Effective Invoice Amount",
+    compute="_compute_effective_invoice_amount",
+    currency_field="currency_id",
+    store=True,
+    )
 
+    
+    @api.depends('payment_amount', 'state')
+    def _compute_effective_invoice_amount(self):
+        excluded_states = ('replaced', 'cancel', 'rejected')
+        for rec in self:
+            if rec.state in excluded_states:
+                rec.effective_invoice_amount = 0.0
+            else:
+                rec.effective_invoice_amount = rec.payment_amount
+                
 
     def _check_reference_ready(self):
         for rec in self:
@@ -33,25 +47,43 @@ class PDCWizard(models.Model):
 
         return super().unlink()
 
-
-
     @api.constrains('reference')
     def _check_reference_not_old_reference(self):
+
         for record in self:
             ref = (record.reference or '').strip()
             if not ref or ref == '/':
                 continue
-
             old_duplicate = self.search([
                 ('old_reference', '=', ref),
                 ('id', '!=', record.id)
             ], limit=1)
-
             if old_duplicate:
                 raise ValidationError(
                     "This cheque reference was used before (as an old reference) "
                     f"in PDC: {old_duplicate.name}. Please use a different number."
                 )
+
+
+        refs = []
+        for rec in self:
+            ref = (rec.reference or '').strip()
+            if ref and ref != '/':
+                refs.append(ref)
+
+        if not refs:
+            return
+
+        dup = self.search([
+            ('old_reference', 'in', list(set(refs))),
+            ('id', 'not in', self.ids),
+        ], limit=1)
+
+        if dup:
+            raise ValidationError(
+                "This cheque reference was used before (as an old reference) "
+                f"in PDC: {dup.name}. Please use a different number."
+            )
 
 
 
@@ -117,11 +149,8 @@ class PDCWizard(models.Model):
         self.ensure_one()
         [action] = self.env.ref('account.action_account_moves_all').read()
 
-        # 1. البحث عن كل السطور المرتبطة بهذا الشيك
         all_lines = self.env['account.move.line'].search([('pdc_id', '=', self.id)])
 
-        # 2. ترتيب القيود من الأحدث (ID الأكبر) إلى الأقدم
-        # قيد الـ Done هو الأحدث، يليه الـ Deposit، يليه الـ Register
         all_moves = all_lines.mapped('move_id').sorted(lambda m: m.id, reverse=True)
 
         if not all_moves:
@@ -196,7 +225,7 @@ class PDCWizard(models.Model):
     payment_amount = fields.Monetary("Payment Amount", tracking=True)
     currency_id = fields.Many2one(
         'res.currency', string="Currency", default=lambda self: self.env.company.currency_id, tracking=True)
-    reference = fields.Char("Cheque Reference", required=True, tracking=True)
+    reference = fields.Char("Cheque Reference", required=True, index=True, tracking=True)
     # journal_id = fields.Many2one('account.journal', string="Payment Journal", domain=[
     #     ('type', '=', 'bank')], required=True, tvracking=True)
     journal_id = fields.Many2one(
@@ -258,7 +287,7 @@ class PDCWizard(models.Model):
         ('replace', 'Replaced')
     ], string='Return Action', readonly=True, tracking=True)
     return_reason = fields.Text(string='Return Reason', readonly=True, tracking=True)
-    old_reference = fields.Char(string='Old Cheque Reference', readonly=True, tracking=True)
+    old_reference = fields.Char(string='Old Cheque Reference', readonly=True, index=True, tracking=True)
     partner_bank_id = fields.Many2one(
         'res.partner.bank',
         string="Customer Bank Account",
@@ -479,7 +508,6 @@ class PDCWizard(models.Model):
             'state': 'rejected',
             'return_action': 'reject',
             'old_reference': old_reference,
-            'payment_amount': 0.0,
         })
 
         # Post to chatter
@@ -550,7 +578,6 @@ class PDCWizard(models.Model):
             'old_reference': old_reference,
             'return_action': 'replace',
             'return_reason': False,
-            'payment_amount': 0.0,
         })
 
         # 🔹 رسالة في الـ chatter
@@ -807,18 +834,17 @@ class PDCWizard(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        self = self.with_context(tracking_disable=True, mail_create_nolog=True)
+
         for vals in vals_list:
             if vals.get('payment_type') == 'receive_money':
-                vals['name'] = self.env['ir.sequence'].next_by_code(
-                    'pdc.payment.customer')
+                vals['name'] = self.env['ir.sequence'].next_by_code('pdc.payment.customer')
             elif vals.get('payment_type') == 'send_money':
-                vals['name'] = self.env['ir.sequence'].next_by_code(
-                    'pdc.payment.vendor')
+                vals['name'] = self.env['ir.sequence'].next_by_code('pdc.payment.vendor')
 
         res = super().create(vals_list)
-        res.attachment_ids.write({
-            'res_id': res.id
-        })
+
+        res.attachment_ids.write({'res_id': res.id})
         return res
 
     # ==============================
@@ -877,9 +903,9 @@ class PDCWizard(models.Model):
                         base_url = request.env['ir.config_parameter'].sudo(
                         ).get_param('web.base.url')
                         url = base_url + "/web#id=" + \
-                              str(record.id) + \
-                              "&&model=pdc.wizard&view_type=form&view_id=" + \
-                              str(view_id)
+                            str(record.id) + \
+                            "&&model=pdc.wizard&view_type=form&view_id=" + \
+                            str(view_id)
                         ctx = {
                             "customer_url": url,
                         }
@@ -904,7 +930,6 @@ class PDCWizard(models.Model):
 
     def action_delete_related_moves(self):
         for model in self:
-            model.payment_amount = 0.0
             move_ids = self.env['account.move'].search(
                 [('pdc_id', '=', model.id)])
             for move in move_ids:

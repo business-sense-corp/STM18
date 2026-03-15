@@ -20,7 +20,7 @@ class ResCompany(models.Model):
         string="Auto Fill open Invoice in PDC on Customer Selection ")
 
     pdc_operation_type = fields.Selection([('cancel', 'Cancel Only'), ('cancel_draft', 'Cancel and Reset to Draft'), ('cancel_delete', 'Cancel and Delete')],
-                                          default='cancel', string="Opration Type")
+                                        default='cancel', string="Opration Type")
 
 
     # =============
