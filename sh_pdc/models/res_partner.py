@@ -26,7 +26,7 @@ class ResPartner(models.Model):
         moves.read(['purchase_line_id', 'date'], load='')
         moves = moves.filtered(
             lambda m: m.date
-                      and m.purchase_line_id
+                    and m.purchase_line_id
                       and m.purchase_line_id.date_planned
                       and m.date.date() <= m.purchase_line_id.date_planned.date()
         )

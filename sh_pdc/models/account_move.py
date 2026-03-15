@@ -106,39 +106,32 @@ class AccountInvoice(models.Model):
     @api.depends(
         'pdc_payment_ids.state',
         'pdc_payment_ids.payment_amount',
+        'pdc_payment_ids.effective_invoice_amount',
         'amount_total',
         'amount_residual'
     )
     def _compute_payment_state(self):
         for move in self:
-            # خلي Odoo يحسب العادي لو مفيش PDC
             if not move.pdc_payment_ids:
                 super(AccountInvoice, move)._compute_payment_state()
                 continue
 
-            # 🔥 1️⃣ أعلى أولوية: In Payment
             if move.pdc_payment_ids.filtered(lambda p: p.state in ('registered', 'deposited')):
                 move.payment_state = 'in_payment'
                 continue
 
-            # 🔥 2️⃣ الشيكات اللي تتحسب
             valid_pdcs = move.pdc_payment_ids.filtered(
                 lambda p: p.state not in ('draft', 'replaced', 'cancel', 'rejected')
             )
 
-            total_pdc_amount = sum(valid_pdcs.mapped('payment_amount'))
+            total_pdc_amount = sum(valid_pdcs.mapped('effective_invoice_amount'))
             invoice_total = move.amount_total
 
-            # 🔴 Not Paid
             if total_pdc_amount == 0:
                 move.payment_state = 'not_paid'
-
-            # 🟡 Partially Paid
             elif 0 < total_pdc_amount < invoice_total:
                 move.payment_state = 'partial'
-
-            # 🟢 Paid
-            elif total_pdc_amount >= invoice_total:
+            else:
                 move.payment_state = 'paid'
 
     def _search_latest_pdc_payment_status(self, operator, value):
@@ -160,24 +153,30 @@ class AccountInvoice(models.Model):
 
             return [('id', 'in', results)]
 
-    @api.depends('pdc_payment_ids.state')
+    @api.depends(
+        'pdc_payment_ids.state',
+        'pdc_payment_ids.payment_amount',
+        'pdc_payment_ids.effective_invoice_amount'
+    )
     def _compute_total_pdc(self):
         for rec in self:
             rec.total_pdc_payment = 0.0
             rec.total_pdc_pending = 0.0
             rec.total_pdc_cancel = 0.0
             rec.total_pdc_received = 0.0
+
             if rec.pdc_payment_ids:
                 for pdc_payment in rec.pdc_payment_ids:
-                    # Updated to include 'cashed' state as received
                     if pdc_payment.state in ('done', 'cashed'):
-                        rec.total_pdc_received += pdc_payment.payment_amount
-                    elif pdc_payment.state in ('cancel', 'rejected'):
-                        rec.total_pdc_cancel += pdc_payment.payment_amount
-                    else:
-                        rec.total_pdc_pending += pdc_payment.payment_amount
-            rec.total_pdc_payment = rec.total_pdc_pending + \
-                                    rec.total_pdc_received + rec.total_pdc_cancel
+                        rec.total_pdc_received += pdc_payment.effective_invoice_amount
+
+                    elif pdc_payment.state in ('cancel', 'rejected', 'replaced'):
+                        rec.total_pdc_cancel += 0.0   # أو payment_amount لو عايز تعرضهم في cancel
+
+                    elif pdc_payment.state in ('draft', 'registered', 'deposited', 'return'):
+                        rec.total_pdc_pending += pdc_payment.effective_invoice_amount
+
+            rec.total_pdc_payment = rec.total_pdc_pending + rec.total_pdc_received
 
     def _compute_pdc_payment_invoice(self):
         self.pdc_payment_ids = False
