@@ -767,44 +767,76 @@ class PDCWizard(models.Model):
 
         self.check_payment_amount()
 
-        # حساب البنك أو النقدي
+        # Done Date is automatically set to today's date.
+        done_date = self.done_date or fields.Date.context_today(self)
+
+        # Bank or cash account.
         if self.journal_id:
             if self.journal_id.type in ['bank', 'cash']:
                 if not self.journal_id.default_account_id:
-                    raise UserError(f"Please configure a default account on the journal: {self.journal_id.name}")
+                    raise UserError(
+                        f"Please configure a default account on the journal: "
+                        f"{self.journal_id.name}"
+                    )
                 bank_account = self.journal_id.default_account_id.id
             else:
                 raise UserError("Journal type must be 'bank' or 'cash'")
+        else:
+            raise UserError("Please select a Payment Journal.")
 
         pdc_under_collection = self.grt_undercollection_account()
-        if self.payment_type == 'receive_money':
-            debit_line = self.get_debit_move_line(bank_account)
-            credit_line = self.get_credit_move_line(pdc_under_collection)
-        else:
-            debit_line = self.get_debit_move_line(pdc_under_collection)
-            credit_line = self.get_credit_move_line(bank_account)
 
-        move_vals = self.get_move_vals(debit_line, credit_line)
+        if self.payment_type == 'receive_money':
+            debit_line = self.get_debit_move_line(
+                bank_account,
+                transaction_date=done_date,
+            )
+            credit_line = self.get_credit_move_line(
+                pdc_under_collection,
+                transaction_date=done_date,
+            )
+        else:
+            debit_line = self.get_debit_move_line(
+                pdc_under_collection,
+                transaction_date=done_date,
+            )
+            credit_line = self.get_credit_move_line(
+                bank_account,
+                transaction_date=done_date,
+            )
+
+        move_vals = self.get_move_vals(
+            debit_line,
+            credit_line,
+            transaction_date=done_date,
+        )
+
         move = Move.create(move_vals)
         move.action_post()
 
-        # 🔁 Reconcile فقط لو فيه فواتير
+        # Reconcile only when invoices are linked.
         if self.invoice_ids:
             for invoice in self.invoice_ids:
                 receivable_lines = invoice.line_ids.filtered(
-                    lambda x: x.account_id.internal_group in ('asset_receivable', 'liability_payable')
+                    lambda line: line.account_id.internal_group
+                    in ('asset_receivable', 'liability_payable')
                 )
+
                 if not receivable_lines:
                     continue
+
                 aml_to_reconcile = (move.line_ids + invoice.line_ids).filtered(
-                    lambda l: l.account_id == receivable_lines[0].account_id and not l.reconciled
+                    lambda line:
+                    line.account_id == receivable_lines[0].account_id
+                    and not line.reconciled
                 )
+
                 if len(aml_to_reconcile) >= 2:
                     aml_to_reconcile.reconcile()
 
         self.write({
             'state': 'done',
-            'done_date': fields.Date.context_today(self),
+            'done_date': done_date,
         })
 
     # form view cancel button
