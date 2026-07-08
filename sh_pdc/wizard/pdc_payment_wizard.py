@@ -606,40 +606,52 @@ class PDCWizard(models.Model):
             'target': 'current',
         }
 
-    def get_debit_move_line(self, account):
+    def get_debit_move_line(self, account, transaction_date=None):
         if not account:
             raise UserError("Missing debit account for PDC transaction.")
+
+        transaction_date = transaction_date or self.payment_date
+
         return {
             'pdc_id': self.id,
             'account_id': account,
             'debit': self.payment_amount,
             'ref': self.memo,
-            'date': self.payment_date,
+            'date': transaction_date,
             'date_maturity': self.due_date,
         }
 
-    def get_credit_move_line(self, account):
+
+    def get_credit_move_line(self, account, transaction_date=None):
         if not account:
             raise UserError("Missing credit account for PDC transaction.")
+
+        transaction_date = transaction_date or self.payment_date
+
         return {
             'pdc_id': self.id,
             'account_id': account,
             'credit': self.payment_amount,
             'ref': self.memo,
-            'date': self.payment_date,
+            'date': transaction_date,
             'date_maturity': self.due_date,
         }
 
-    def get_move_vals(self, debit_line, credit_line):
+
+    def get_move_vals(self, debit_line, credit_line, transaction_date=None):
+        transaction_date = transaction_date or self.payment_date
+
         return {
             'pdc_id': self.id,
-            'date': self.payment_date,
+            'date': transaction_date,
             'journal_id': self.journal_id.id,
             'partner_id': self.partner_id.id,
             'ref': self.memo,
             'move_type': 'entry',
-            'line_ids': [(0, 0, debit_line),
-                         (0, 0, credit_line)]
+            'line_ids': [
+                (0, 0, debit_line),
+                (0, 0, credit_line),
+            ]
         }
 
     def action_deposited(self):
@@ -649,60 +661,52 @@ class PDCWizard(models.Model):
 
         self.check_payment_amount()
 
+        if not self.deposited_date:
+            raise UserError("Please set the Deposit Date before depositing the check.")
+
         if self.invoice_ids:
             list_amount_residuals = self.invoice_ids.mapped('amount_residual')
-            amount = (self.currency_id.round(sum(list_amount_residuals))
-                      if self.currency_id else round(sum(list_amount_residuals), 2))
+            amount = (
+                self.currency_id.round(sum(list_amount_residuals))
+                if self.currency_id
+                else round(sum(list_amount_residuals), 2)
+            )
 
             if self.payment_amount > amount and amount != 0:
                 raise UserError(
-                    "Payment amount is greater than total invoice/bill amount!!!")
+                    "Payment amount is greater than total invoice/bill amount!!!"
+                )
 
-        # Create journal entries when registering
         pdc_account = self.check_pdc_account()
         pdc_under_collection = self.grt_undercollection_account()
 
-        # Create Journal Item
-        move_line_vals_debit = {}
-        move_line_vals_credit = {}
         if self.payment_type == 'receive_money':
-            move_line_vals_debit = self.get_debit_move_line(pdc_under_collection)
-            move_line_vals_credit = self.get_credit_move_line(pdc_account)
+            move_line_vals_debit = self.get_debit_move_line(
+                pdc_under_collection,
+                transaction_date=self.deposited_date,
+            )
+            move_line_vals_credit = self.get_credit_move_line(
+                pdc_account,
+                transaction_date=self.deposited_date,
+            )
         else:
-            move_line_vals_debit = self.get_debit_move_line(pdc_account)
-            move_line_vals_credit = self.get_credit_move_line(pdc_under_collection)
+            move_line_vals_debit = self.get_debit_move_line(
+                pdc_account,
+                transaction_date=self.deposited_date,
+            )
+            move_line_vals_credit = self.get_credit_move_line(
+                pdc_under_collection,
+                transaction_date=self.deposited_date,
+            )
 
-        # create move and post it
         move_vals = self.get_move_vals(
-            move_line_vals_debit, move_line_vals_credit)
+            move_line_vals_debit,
+            move_line_vals_credit,
+            transaction_date=self.deposited_date,
+        )
 
         move_id = move.create(move_vals)
         move_id.action_post()
-
-        # if self.invoice_ids:
-        #     for invoice in self.invoice_ids:
-        #         receivable_lines = invoice.line_ids.filtered(
-        #             lambda x: x.account_id.internal_group in ('asset_receivable', 'liability_payable')
-        #         )
-        #         if not receivable_lines:
-        #             continue
-        #
-        #         register_move_lines = self.env['account.move.line'].search([
-        #             ('pdc_id', '=', self.id),
-        #             ('account_id', '=', receivable_lines[0].account_id.id),
-        #             ('reconciled', '=', False)
-        #         ])
-        #
-        #         aml_to_reconcile = (register_move_lines + invoice.line_ids).filtered(
-        #             lambda l: l.account_id == receivable_lines[0].account_id and not l.reconciled
-        #         )
-        #
-        #         if len(aml_to_reconcile) >= 2:
-        #             aml_to_reconcile.reconcile()
-        #
-        #             # 🔥 FORCE In Payment (Odoo 18)
-        #             invoice.invalidate_cache()
-        #             invoice.sudo().write({'payment_state': 'in_payment'})
 
         self.write({'state': 'deposited'})
 
