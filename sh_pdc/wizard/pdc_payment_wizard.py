@@ -272,7 +272,8 @@ class PDCWizard(models.Model):
     pdc_receivable_account_id = fields.Many2one(
         'account.account',
         string='Check Account',
-        tracking=True
+        domain=[('account_type', '=', 'asset_current')],
+        tracking=True,
     )
 
     installment_no = fields.Char("Installment No", tracking=True)
