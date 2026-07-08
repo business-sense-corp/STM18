@@ -130,7 +130,6 @@
                             <field name="due_date" readonly="state not in ['draft','returned']" />
                             <!-- UPDATED: Allow editing in deposited state -->
                             <field name="deposited_date"
-                                readonly="state != 'registered'"
                             />
                             <!-- UPDATED: Removed 'bounced' from readonly condition -->
                             <field name="memo" readonly="state not in ['draft','returned']" />

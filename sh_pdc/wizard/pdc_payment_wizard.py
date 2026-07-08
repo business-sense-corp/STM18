@@ -87,57 +87,72 @@ class PDCWizard(models.Model):
 
 
 
-    def action_register_check(self):
-        active_ids = self.env.context.get('active_ids')
-        active_model = self.env.context.get('active_model')
-        active_id = self.env.context.get('active_id')
-        account_move_model = self.env[active_model].browse(active_id)
+    def action_register(self):
+        self.ensure_one()
+        self._check_reference_ready()
 
-        if account_move_model.move_type not in ('out_invoice', 'in_invoice'):
-            raise UserError(
-                "Only Customer invoice and vendor bills are considered!")
+        Move = self.env['account.move']
 
-        move_listt = []
-        payment_amount = 0.0
-        payment_type = ''
-        if len(active_ids) > 0:
-            account_moves = self.env[active_model].browse(active_ids)
-            partners = account_moves.mapped('partner_id')
-            if len(set(partners)) != 1:
-                raise UserError('Partners must be same')
+        self.check_payment_amount()
 
-            states = account_moves.mapped('state')
-            if len(set(states)) != 1 or states[0] != 'posted':
+        # Use Payment Date, or today's date when it is empty.
+        register_date = (
+            self.payment_date
+            or fields.Date.context_today(self)
+        )
+
+        if self.invoice_ids:
+            list_amount_residuals = self.invoice_ids.mapped(
+                'amount_residual'
+            )
+
+            amount = (
+                self.currency_id.round(sum(list_amount_residuals))
+                if self.currency_id
+                else round(sum(list_amount_residuals), 2)
+            )
+
+            if self.payment_amount > amount and amount != 0:
                 raise UserError(
-                    'Only posted invoices/bills are considered for PDC payment!!')
+                    "Payment amount is greater than "
+                    "total invoice/bill amount!!!"
+                )
 
-            for account_move in account_moves:
-                if account_move.payment_state != 'paid' and account_move.amount_residual != 0.0:
-                    payment_amount = payment_amount + account_move.amount_residual
-                    move_listt.append(account_move.id)
-        if not move_listt:
-            raise UserError("Selected invoices/bills are already paid!!")
+        pdc_account = self.check_pdc_account()
+        partner_account = self.get_partner_account()
 
-        if account_moves[0].move_type in ('in_invoice'):
-            payment_type = 'send_money'
+        if self.payment_type == 'receive_money':
+            move_line_vals_debit = self.get_debit_move_line(
+                pdc_account,
+                transaction_date=register_date,
+            )
+            move_line_vals_credit = self.get_credit_move_line(
+                partner_account,
+                transaction_date=register_date,
+            )
+        else:
+            move_line_vals_debit = self.get_debit_move_line(
+                partner_account,
+                transaction_date=register_date,
+            )
+            move_line_vals_credit = self.get_credit_move_line(
+                pdc_account,
+                transaction_date=register_date,
+            )
 
-        if account_moves[0].move_type in ('out_invoice'):
-            payment_type = 'receive_money'
+        move_vals = self.get_move_vals(
+            move_line_vals_debit,
+            move_line_vals_credit,
+            transaction_date=register_date,
+        )
 
-        return {
-            'name': 'PDC Payment',
-            'res_model': 'pdc.wizard',
-            'view_mode': 'form',
-            'view_id': self.env.ref('sh_pdc.sh_pdc_wizard_form_wizard').id,
-            'context': {
-                'default_invoice_ids': [(6, 0, move_listt)],
-                'default_partner_id': account_move_model.partner_id.id,
-                'default_payment_amount': payment_amount,
-                'default_payment_type': payment_type
-            },
-            'target': 'new',
-            'type': 'ir.actions.act_window'
-        }
+        move_id = Move.create(move_vals)
+        move_id.action_post()
+
+        self.write({
+            'state': 'registered',
+            'payment_date': register_date,
+        })
 
     def open_attachments(self):
         [action] = self.env.ref('base.action_attachment').read()
@@ -239,7 +254,10 @@ class PDCWizard(models.Model):
     #     'paid', 'Paid')], string="Cheque Status", default='draft', tracking=True)
     cheque_status = fields.Selection([('draft', 'Draft')], string="Cheque Status", default='draft', tracking=True)
     payment_date = fields.Date(
-        "Payment Date", default=fields.Date.today(), required=True, tracking=True)
+        "Payment Date",
+        default=lambda self: fields.Date.context_today(self),
+        tracking=True,
+    )
     due_date = fields.Date("Due Date", required=True, tracking=True)
     memo = fields.Char("Memo", required=True, tracking=True)
     agent = fields.Char("Agent", tracking=True)
@@ -361,49 +379,6 @@ class PDCWizard(models.Model):
                 self.action_done()
                 self.write({'state': 'done'})
 
-    def action_register(self):
-        self.ensure_one()
-        self._check_reference_ready()
-        move = self.env['account.move']
-
-        self.check_payment_amount()
-
-        if self.invoice_ids:
-            list_amount_residuals = self.invoice_ids.mapped('amount_residual')
-            amount = (self.currency_id.round(sum(list_amount_residuals))
-                      if self.currency_id else round(sum(list_amount_residuals), 2))
-
-            if self.payment_amount > amount and amount != 0:
-                raise UserError(
-                    "Payment amount is greater than total invoice/bill amount!!!")
-
-        # Create journal entries when registering
-        pdc_account = self.check_pdc_account()
-        partner_account = self.get_partner_account()
-
-        # Create Journal Item
-        move_line_vals_debit = {}
-        move_line_vals_credit = {}
-        if self.payment_type == 'receive_money':
-            move_line_vals_debit = self.get_debit_move_line(pdc_account)
-            move_line_vals_credit = self.get_credit_move_line(partner_account)
-        else:
-            move_line_vals_debit = self.get_debit_move_line(partner_account)
-            move_line_vals_credit = self.get_credit_move_line(pdc_account)
-
-        # create move and post it
-        move_vals = self.get_move_vals(
-            move_line_vals_debit, move_line_vals_credit)
-
-        self.write({'state': 'registered'})
-
-        # total_amount_residuals = sum(
-        #     self.invoice_ids.mapped('amount_residual'))
-        # if self.invoice_ids and total_amount_residuals != 0:
-        move_id = move.create(move_vals)
-        move_id.action_post()
-
-        self.state = 'registered'
 
     def check_payment_amount(self):
         if self.payment_amount <= 0.0:
@@ -661,11 +636,16 @@ class PDCWizard(models.Model):
 
         self.check_payment_amount()
 
-        if not self.deposited_date:
-            raise UserError("Please set the Deposit Date before depositing the check.")
+        # Use Deposit Date, or today's date when it is empty.
+        deposit_date = (
+            self.deposited_date
+            or fields.Date.context_today(self)
+        )
 
         if self.invoice_ids:
-            list_amount_residuals = self.invoice_ids.mapped('amount_residual')
+            list_amount_residuals = self.invoice_ids.mapped(
+                'amount_residual'
+            )
             amount = (
                 self.currency_id.round(sum(list_amount_residuals))
                 if self.currency_id
@@ -674,7 +654,8 @@ class PDCWizard(models.Model):
 
             if self.payment_amount > amount and amount != 0:
                 raise UserError(
-                    "Payment amount is greater than total invoice/bill amount!!!"
+                    "Payment amount is greater than "
+                    "total invoice/bill amount!!!"
                 )
 
         pdc_account = self.check_pdc_account()
@@ -683,32 +664,35 @@ class PDCWizard(models.Model):
         if self.payment_type == 'receive_money':
             move_line_vals_debit = self.get_debit_move_line(
                 pdc_under_collection,
-                transaction_date=self.deposited_date,
+                transaction_date=deposit_date,
             )
             move_line_vals_credit = self.get_credit_move_line(
                 pdc_account,
-                transaction_date=self.deposited_date,
+                transaction_date=deposit_date,
             )
         else:
             move_line_vals_debit = self.get_debit_move_line(
                 pdc_account,
-                transaction_date=self.deposited_date,
+                transaction_date=deposit_date,
             )
             move_line_vals_credit = self.get_credit_move_line(
                 pdc_under_collection,
-                transaction_date=self.deposited_date,
+                transaction_date=deposit_date,
             )
 
         move_vals = self.get_move_vals(
             move_line_vals_debit,
             move_line_vals_credit,
-            transaction_date=self.deposited_date,
+            transaction_date=deposit_date,
         )
 
         move_id = move.create(move_vals)
         move_id.action_post()
 
-        self.write({'state': 'deposited'})
+        self.write({
+            'state': 'deposited',
+            'deposited_date': deposit_date,
+        })
 
     def action_cashed(self):
         self.ensure_one()
@@ -716,6 +700,7 @@ class PDCWizard(models.Model):
         Move = self.env['account.move']
 
         self.check_payment_amount()
+        
 
         # حساب PDC
         pdc_account = self.check_pdc_account()
@@ -763,29 +748,31 @@ class PDCWizard(models.Model):
     def action_done(self):
         self.ensure_one()
         self._check_reference_ready()
+
         Move = self.env['account.move']
 
         self.check_payment_amount()
 
-        # Done Date is automatically set to today's date.
+        # استخدام Done Date، ولو فاضي يتم استخدام تاريخ اليوم.
         done_date = self.done_date or fields.Date.context_today(self)
 
-        # Bank or cash account.
-        if self.journal_id:
-            if self.journal_id.type in ['bank', 'cash']:
-                if not self.journal_id.default_account_id:
-                    raise UserError(
-                        f"Please configure a default account on the journal: "
-                        f"{self.journal_id.name}"
-                    )
-                bank_account = self.journal_id.default_account_id.id
-            else:
-                raise UserError("Journal type must be 'bank' or 'cash'")
-        else:
+        # تحديد حساب البنك أو النقدية من الـ Payment Journal.
+        if not self.journal_id:
             raise UserError("Please select a Payment Journal.")
 
+        if self.journal_id.type not in ('bank', 'cash'):
+            raise UserError("Journal type must be 'bank' or 'cash'.")
+
+        if not self.journal_id.default_account_id:
+            raise UserError(
+                f"Please configure a default account on the journal: "
+                f"{self.journal_id.name}"
+            )
+
+        bank_account = self.journal_id.default_account_id.id
         pdc_under_collection = self.grt_undercollection_account()
 
+        # إنشاء سطور القيد بتاريخ Done Date.
         if self.payment_type == 'receive_money':
             debit_line = self.get_debit_move_line(
                 bank_account,
@@ -805,6 +792,7 @@ class PDCWizard(models.Model):
                 transaction_date=done_date,
             )
 
+        # إنشاء رأس القيد بنفس Done Date.
         move_vals = self.get_move_vals(
             debit_line,
             credit_line,
@@ -814,7 +802,7 @@ class PDCWizard(models.Model):
         move = Move.create(move_vals)
         move.action_post()
 
-        # Reconcile only when invoices are linked.
+        # Reconcile فقط لو فيه فواتير مرتبطة.
         if self.invoice_ids:
             for invoice in self.invoice_ids:
                 receivable_lines = invoice.line_ids.filtered(
@@ -825,7 +813,9 @@ class PDCWizard(models.Model):
                 if not receivable_lines:
                     continue
 
-                aml_to_reconcile = (move.line_ids + invoice.line_ids).filtered(
+                aml_to_reconcile = (
+                    move.line_ids + invoice.line_ids
+                ).filtered(
                     lambda line:
                     line.account_id == receivable_lines[0].account_id
                     and not line.reconciled
