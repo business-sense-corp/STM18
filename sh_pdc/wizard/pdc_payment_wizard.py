@@ -297,8 +297,8 @@ class PDCWizard(models.Model):
     invoice_ids = fields.Many2many('account.move')
     account_move_ids = fields.Many2many(
         'account.move', compute="compute_account_moves", )
-    done_date = fields.Date(string="Done Date", readonly=True, tracking=True)
-    deposited_date = fields.Date(string="Deposit Date")
+    done_date = fields.Date(string="Done Date", tracking=True)
+    deposited_date = fields.Date(string="Deposit Date", tracking=True)
 
     # Return action fields
     return_action = fields.Selection([
