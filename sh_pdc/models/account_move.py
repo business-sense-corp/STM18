@@ -1,12 +1,58 @@
 # -*- coding: utf-8 -*-
 # Part of Softhealer Technologies.
+
 from odoo import api, fields, models
+from odoo.osv import expression
 
 
 class AccountInvoice(models.Model):
     _inherit = "account.move"
 
+    @api.model
+    def name_search(
+        self,
+        name='',
+        args=None,
+        operator='ilike',
+        limit=100,
+    ):
+        clean_name = (name or '').strip()
+        args = args or []
+
+        if clean_name:
+            exact_invoice_domain = expression.AND([
+                args,
+                [
+                    ('name', '=', clean_name),
+                    (
+                        'move_type',
+                        'in',
+                        ('out_invoice', 'in_invoice'),
+                    ),
+                    ('state', '=', 'posted'),
+                ],
+            ])
+
+            exact_invoices = self.search(
+                exact_invoice_domain,
+                limit=limit,
+            )
+
+            if exact_invoices:
+                return [
+                    (move.id, move.display_name)
+                    for move in exact_invoices
+                ]
+
+        return super().name_search(
+            name=clean_name,
+            args=args,
+            operator=operator,
+            limit=limit,
+        )
+
     is_boolean = fields.Boolean(compute="compute_is_boolean")
+
 
     def compute_is_boolean(self):
         for rec in self:

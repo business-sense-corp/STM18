@@ -331,24 +331,48 @@ class PDCWizard(models.Model):
         moves = self.env['account.move'].search(domain)
         self.account_move_ids = moves.ids
 
-    @api.onchange('partner_id')
+    @api.onchange('partner_id', 'payment_type')
     def _onchange_partner(self):
+        # مسح فواتير وبيانات العميل السابق
+        self.invoice_ids = [(5, 0, 0)]
+        self.invoice_id = False
+        self.memo = False
+
+        if not self.partner_id:
+            return
 
         if self.env.company.auto_fill_open_invoice:
-
-            domain = [('partner_id', '=', self.partner_id.id), ('payment_state', '!=',
-                                                                'paid'), ('amount_residual', '!=', 0.0),
-                      ('state', '=', 'posted')]
+            domain = [
+                ('partner_id', '=', self.partner_id.id),
+                ('payment_state', '!=', 'paid'),
+                ('amount_residual', '!=', 0.0),
+                ('state', '=', 'posted'),
+            ]
 
             if self.payment_type == 'receive_money':
-                domain.extend([('move_type', '=', 'out_invoice')])
-
+                domain.append(('move_type', '=', 'out_invoice'))
             else:
-                domain.extend([('move_type', '=', 'in_invoice')])
+                domain.append(('move_type', '=', 'in_invoice'))
 
             moves = self.env['account.move'].search(domain)
 
+            # إضافة الفواتير الخاصة بالـ Partner
             self.invoice_ids = [(6, 0, moves.ids)]
+
+            # وضع أرقام الفواتير في حقل Memo
+            invoice_names = moves.filtered(
+                lambda move: move.name and move.name != '/'
+            ).mapped('name')
+
+            self.memo = ', '.join(invoice_names) if invoice_names else False
+
+    @api.onchange('invoice_ids')
+    def _onchange_invoice_ids(self):
+        invoice_names = self.invoice_ids.filtered(
+            lambda move: move.name and move.name != '/'
+        ).mapped('name')
+
+        self.memo = ', '.join(invoice_names) if invoice_names else False
 
     # Register pdc payment
     def button_register(self):

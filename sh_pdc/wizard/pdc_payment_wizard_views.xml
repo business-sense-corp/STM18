@@ -130,14 +130,15 @@
                             <field name="due_date" readonly="state not in ['draft','returned']" />
                             <!-- UPDATED: Allow editing in deposited state -->
                             <field name="deposited_date"
-                            />
+                                readonly="state not in ['draft', 'registered']" />
                             <!-- UPDATED: Removed 'bounced' from readonly condition -->
                             <field name="memo" readonly="state not in ['draft','returned']" />
                             <!-- UPDATED: Removed 'bounced' from readonly condition -->
                             <field name="agent" readonly="state not in ['draft','returned']" />
                             <!-- UPDATED: Removed 'bounced' from readonly condition -->
                             <field name="bank_id" readonly="state not in ['draft','returned']" />
-                            <field name="done_date" />
+                            <field name="done_date"
+                                readonly="state not in ['draft', 'registered', 'deposited', 'cashed']" />
                         </group>
                         <!-- Return Information Section -->
                         <group string="Return Information"
