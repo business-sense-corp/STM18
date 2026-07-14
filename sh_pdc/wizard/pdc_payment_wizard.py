@@ -445,6 +445,82 @@ class PDCWizard(models.Model):
             raise UserError("Partner is missing a valid receivable or payable account.")
         return account.id
 
+    def _reconcile_paid_cheque_with_invoices(self):
+        """Reconcile the cheque register line with its linked invoices/bills."""
+        self.ensure_one()
+
+        linked_invoices = self.invoice_ids
+        if self.invoice_id:
+            linked_invoices |= self.invoice_id
+
+        linked_invoices = linked_invoices.filtered(
+            lambda move: move.state == 'posted'
+            and move.amount_residual != 0.0
+        )
+
+        if not linked_invoices:
+            return
+
+        partner_account_id = self.get_partner_account()
+
+        # The receivable/payable line exists in the Register entry, not in the
+        # Done/Cashed entry. Customer cheques create a credit receivable line,
+        # while vendor cheques create a debit payable line.
+        register_line_domain = [
+            ('pdc_id', '=', self.id),
+            ('account_id', '=', partner_account_id),
+            ('parent_state', '=', 'posted'),
+            ('reconciled', '=', False),
+        ]
+
+        if self.payment_type == 'receive_money':
+            register_line_domain.append(('credit', '>', 0.0))
+        else:
+            register_line_domain.append(('debit', '>', 0.0))
+
+        register_line = self.env['account.move.line'].search(
+            register_line_domain,
+            order='date asc, id asc',
+            limit=1,
+        )
+
+        if not register_line:
+            raise UserError(
+                "The unreconciled receivable/payable line created during "
+                "cheque registration could not be found."
+            )
+
+        # Reconcile the invoice opened from the wizard first, then the other
+        # linked invoices in due-date order. This also supports partial payment
+        # and a cheque linked to more than one invoice.
+        ordered_invoices = linked_invoices.sorted(
+            key=lambda move: (
+                0 if self.invoice_id and move.id == self.invoice_id.id else 1,
+                move.invoice_date_due or move.date,
+                move.id,
+            )
+        )
+
+        for invoice in ordered_invoices:
+            invoice_lines = invoice.line_ids.filtered(
+                lambda line: line.account_id.id == partner_account_id
+                and line.parent_state == 'posted'
+                and not line.reconciled
+            )
+
+            if not invoice_lines:
+                continue
+
+            (register_line + invoice_lines).reconcile()
+            register_line.invalidate_recordset([
+                'reconciled',
+                'amount_residual',
+                'amount_residual_currency',
+            ])
+
+            if register_line.reconciled:
+                break
+
     def action_returned(self):
         """Move to Return state - user will choose reject or reset to draft"""
         self.check_payment_amount()
@@ -751,19 +827,8 @@ class PDCWizard(models.Model):
         move = Move.create(move_vals)
         move.action_post()
 
-        # 🔁 Reconcile فقط لو فيه فواتير
-        if self.invoice_ids:
-            for invoice in self.invoice_ids:
-                receivable_lines = invoice.line_ids.filtered(
-                    lambda x: x.account_id.internal_group in ('asset_receivable', 'liability_payable')
-                )
-                if not receivable_lines:
-                    continue
-                aml_to_reconcile = (move.line_ids + invoice.line_ids).filtered(
-                    lambda l: l.account_id == receivable_lines[0].account_id and not l.reconciled
-                )
-                if len(aml_to_reconcile) >= 2:
-                    aml_to_reconcile.reconcile()
+        # Reconcile using the receivable/payable line created by Register.
+        self._reconcile_paid_cheque_with_invoices()
 
         self.write({
             'state': 'cashed',
@@ -827,27 +892,8 @@ class PDCWizard(models.Model):
         move = Move.create(move_vals)
         move.action_post()
 
-        # Reconcile فقط لو فيه فواتير مرتبطة.
-        if self.invoice_ids:
-            for invoice in self.invoice_ids:
-                receivable_lines = invoice.line_ids.filtered(
-                    lambda line: line.account_id.internal_group
-                    in ('asset_receivable', 'liability_payable')
-                )
-
-                if not receivable_lines:
-                    continue
-
-                aml_to_reconcile = (
-                    move.line_ids + invoice.line_ids
-                ).filtered(
-                    lambda line:
-                    line.account_id == receivable_lines[0].account_id
-                    and not line.reconciled
-                )
-
-                if len(aml_to_reconcile) >= 2:
-                    aml_to_reconcile.reconcile()
+        # Reconcile using the receivable/payable line created by Register.
+        self._reconcile_paid_cheque_with_invoices()
 
         self.write({
             'state': 'done',
