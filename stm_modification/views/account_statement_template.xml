@@ -366,23 +366,23 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="k">Cash / Bank Collected</td>
-                                                        <td class="v text-right nowrap">
-                                                            <span
-                                                                t-esc="cs.get('cash_amount', 0.0)" />
-                                                        </td>
                                                         <td class="k">Total Cheques</td>
                                                         <td class="v text-center nowrap">
                                                             <span t-esc="cs.get('total', 0)" />
                                                         </td>
-                                                    </tr>
-                                                    <tr>
                                                         <td class="k">Collected / Rejected /
                                                             Remaining</td>
-                                                        <td class="v text-center nowrap" colspan="3">
+                                                        <td class="v text-center nowrap">
                                                             <span t-esc="cs.get('collected', 0)" />
                                                             / <span t-esc="cs.get('rejected', 0)" />
                                                             / <span t-esc="cs.get('remaining', 0)" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="k">Cash / Bank Collected</td>
+                                                        <td class="v text-right nowrap" colspan="3">
+                                                            <span
+                                                                t-esc="cs.get('cash_amount', 0.0)" />
                                                         </td>
                                                     </tr>
                                                 </table>
