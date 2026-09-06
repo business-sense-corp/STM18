@@ -45,13 +45,24 @@ class AccountStatementReport(models.AbstractModel):
         if partner_id:
             line_domain.append(('partner_id', '=', partner_id))
 
-        if product_id:
-            line_domain.append(('product_id', '=', product_id))
-
         if date_from:
             line_domain.append(('date', '>=', date_from))
         if date_to:
             line_domain.append(('date', '<=', date_to))
+
+        if product_id:
+            # هات أوامر البيع اللي فيها المنتج ده، عشان نلاقي سطور الـ down payment التابعة لنفس الأوردر
+            related_orders = self.env['sale.order.line'].search([
+                ('product_id', '=', product_id),
+            ]).mapped('order_id')
+
+            # هات سطور الفاتورة: إما المنتج نفسه، أو سطر down payment تابع لنفس الأوردر
+            line_domain += ['|',
+                ('product_id', '=', product_id),
+                '&',
+                ('sale_line_ids.is_downpayment', '=', True),
+                ('sale_line_ids.order_id', 'in', related_orders.ids),
+            ]
 
         invoice_lines = self.env['account.move.line'].search(line_domain, order='date asc, id asc')
 
@@ -138,32 +149,33 @@ class AccountStatementReport(models.AbstractModel):
         collected_amount = sum(all_installments.filtered(lambda c: c.state in ['done', 'cashed']).mapped('payment_amount')) if total_cheques else 0.0
         cheques_rejected = len(all_installments.filtered(lambda c: c.state == 'cancel')) if total_cheques else 0
         cheques_remaining = total_cheques - cheques_collected
+
         total_cash_amount = sum(
             self._get_cash_paid_amount(inv) for inv in all_invoices
         )
         collected_amount += total_cash_amount
 
         return {
-                'doc_ids': partner.ids if partner else [],
-                'doc_model': 'res.partner',
-                'docs': partner,
-                'partner': partner,
-                'company': company,
-                'date_from': date_from,
-                'date_to': date_to,
-                'statement_date': date_to or fields.Date.today(),
-                'account_lines': account_lines,
-                'balance_forward': balance_forward,
-                'current_balance': current_balance,
-                'units': units,
+            'doc_ids': partner.ids if partner else [],
+            'doc_model': 'res.partner',
+            'docs': partner,
+            'partner': partner,
+            'company': company,
+            'date_from': date_from,
+            'date_to': date_to,
+            'statement_date': date_to or fields.Date.today(),
+            'account_lines': account_lines,
+            'balance_forward': balance_forward,
+            'current_balance': current_balance,
+            'units': units,
 
-                'collected_amount': collected_amount,
-                'outstanding_amount': current_balance if partner_id else 0.0,
-                'total_cheques': total_cheques,
-                'cheques_collected': cheques_collected,
-                'cheques_rejected': cheques_rejected,
-                'cheques_remaining': cheques_remaining,
-            }
+            'collected_amount': collected_amount,
+            'outstanding_amount': current_balance if partner_id else 0.0,
+            'total_cheques': total_cheques,
+            'cheques_collected': cheques_collected,
+            'cheques_rejected': cheques_rejected,
+            'cheques_remaining': cheques_remaining,
+        }
 
     def _get_account_lines(self, partner_id, date_from, date_to):
         if not partner_id:
