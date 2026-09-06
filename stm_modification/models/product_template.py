@@ -1,7 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
-from odoo.orm.fields_textual import Char
-
+from odoo.fields import Char
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
