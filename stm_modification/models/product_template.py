@@ -1,11 +1,12 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.orm.fields_textual import Char
 
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-    project_location = fields.Char(string="Project / Location")
+    project_location: Char = fields.Char(string="Project / Location")
     project_type = fields.Char(string="Type")
     building_no = fields.Char(string="Building No.")
     unit_no = fields.Char(string="Unit No.")

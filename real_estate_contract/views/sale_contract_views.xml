@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_contract_form" model="ir.ui.view">
+        <field name="name">real.estate.contract.form</field>
+        <field name="model">real.estate.contract</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sale_order_id" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="categ_id"/>
+                            <field name="date_confirmed"/>
+                        </group>
+                        <group>
+                            <field name="project_location"/>
+                            <field name="project_type"/>
+                            <field name="building_no"/>
+                            <field name="unit_no"/>
+                            <field name="unit_area"/>
+                            <field name="unit_location"/>
+                            <field name="total_building_area"/>
+                        </group>
+                    </group>
+                    <group string="Pricing">
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="cash_meter_price"/>
+                            <field name="total_cash_price"/>
+                        </group>
+                        <group>
+                            <field name="installment_meter_price"/>
+                            <field name="total_installment_price"/>
+                        </group>
+                    </group>
+                    <group string="Amenities">
+                        <group>
+                            <field name="garage_yes_no"/>
+                            <field name="garden_yes_no"/>
+                            <field name="garden_area" invisible="not garden_yes_no"/>
+                        </group>
+                        <group>
+                            <field name="club_house"/>
+                            <field name="roof_yes_no"/>
+                            <field name="roof_area" invisible="not roof_yes_no"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="unit_description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_contract_list" model="ir.ui.view">
+        <field name="name">real.estate.contract.list</field>
+        <field name="model">real.estate.contract</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="unit_no"/>
+                <field name="total_cash_price"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_real_estate_contract" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">real.estate.contract</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_real_estate_contract_root" name="Real Estate Contracts" sequence="60"/>
+    <menuitem id="menu_real_estate_contract" name="Contracts"
+              parent="menu_real_estate_contract_root"
+              action="action_real_estate_contract" sequence="10"/>
+
+</odoo>
