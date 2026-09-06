@@ -58,6 +58,7 @@ class RealEstateContract(models.Model):
     roof_yes_no = fields.Boolean(string='Roof')
     garden_area = fields.Float(string='Garden Area')
     roof_area = fields.Float(string='Roof Area')
+    internal_notes = fields.Text(string='Internal Notes')
 
     _sql_constraints = [
         ('sale_line_uniq', 'unique(sale_line_id)',
@@ -96,6 +97,7 @@ class RealEstateContract(models.Model):
             'roof_yes_no': product.roof_yes_no,
             'garden_area': product.garden_area,
             'roof_area': product.roof_area,
+            'internal_notes': product.description,
         }
 
     @api.model_create_multi
