@@ -52,7 +52,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Description">
+                        <page string="Unit Description">
                             <field name="unit_description"/>
                         </page>
                         <page string="Internal Notes">
