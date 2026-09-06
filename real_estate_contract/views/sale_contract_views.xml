@@ -54,6 +54,8 @@
                     <notebook>
                         <page string="Description">
                             <field name="unit_description"/>
+                        </page>
+                        <page string="Internal Notes">
                             <field name="internal_notes"/>
                         </page>
                     </notebook>
