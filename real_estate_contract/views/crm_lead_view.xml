@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_lead_view_form_real_estate" model="ir.ui.view">
+        <field name="name">crm.lead.form.real.estate</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Real Estate Unit" name="real_estate_unit">
+                    <group>
+                        <group string="Unit">
+                            <field name="product_id"/>
+                            <field name="product_name" readonly="1"/>
+                            <field name="categ_id" readonly="1"/>
+                            <field name="project_name" readonly="1"/>
+                            <field name="project_location"/>
+                            <field name="project_type"/>
+                            <field name="building_no"/>
+                            <field name="unit_no"/>
+                            <field name="unit_area"/>
+                            <field name="total_building_area"/>
+                            <field name="unit_location"/>
+                        </group>
+                        <group string="Pricing">
+                            <field name="cash_meter_price"/>
+                            <field name="total_cash_price"/>
+                            <field name="installment_meter_price"/>
+                            <field name="total_installment_price"/>
+                        </group>
+                        <group string="Extras">
+                            <field name="garage_yes_no"/>
+                            <field name="club_house"/>
+                            <field name="garden_yes_no"/>
+                            <field name="garden_area" invisible="not garden_yes_no"/>
+                            <field name="roof_yes_no"/>
+                            <field name="roof_area" invisible="not roof_yes_no"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="unit_description" nolabel="1"/>
+                    </group>
+                    <group string="Description">
+                        <field name="internal_notes" nolabel="1"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>
