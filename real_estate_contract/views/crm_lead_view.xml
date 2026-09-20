@@ -12,7 +12,6 @@
                             <field name="product_id"/>
                             <field name="product_name" readonly="1"/>
                             <field name="categ_id" readonly="1"/>
-                            <field name="project_name" readonly="1"/>
                             <field name="project_location"/>
                             <field name="project_type"/>
                             <field name="building_no"/>
