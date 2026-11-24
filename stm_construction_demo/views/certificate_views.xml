@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Certificate List View -->
+    <record id="view_construction_certificate_list" model="ir.ui.view">
+        <field name="name">construction.certificate.list</field>
+        <field name="model">construction.certificate</field>
+        <field name="arch" type="xml">
+            <list string="المستخلصات"
+                  decoration-danger="state == 'rejected'"
+                  decoration-success="state == 'paid'"
+                  decoration-info="state in ('pm_approved', 'accounting')"
+                  decoration-warning="state == 'site_engineer'">
+                <field name="name"/>
+                <field name="certificate_no"/>
+                <field name="certificate_type" widget="badge"
+                       decoration-primary="certificate_type == 'vendor'"
+                       decoration-info="certificate_type == 'customer'"/>
+                <field name="date"/>
+                <field name="project_id"/>
+                <field name="partner_id"/>
+                <field name="work_scope" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="contract_total" widget="monetary" options="{'currency_field': 'currency_id'}" sum="التعاقد"/>
+                <field name="prev_total" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" sum="السابق"/>
+                <field name="curr_total" widget="monetary" options="{'currency_field': 'currency_id'}" sum="الحالي"/>
+                <field name="cumul_total" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" sum="التراكمي"/>
+                <field name="net_payable_curr" string="صافي المستحق" widget="monetary" options="{'currency_field': 'currency_id'}" sum="الصافي المستحق"/>
+                <field name="overall_progress_percent" string="الإنجاز %" widget="progressbar"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-warning="state == 'site_engineer'"
+                       decoration-primary="state == 'pm_approved'"
+                       decoration-info="state == 'accounting'"
+                       decoration-success="state == 'paid'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Certificate Form View -->
+    <record id="view_construction_certificate_form" model="ir.ui.view">
+        <field name="name">construction.certificate.form</field>
+        <field name="model">construction.certificate</field>
+        <field name="arch" type="xml">
+            <form string="مستخلص الأعمال">
+                <header>
+                    <button name="action_load_from_boq"
+                            type="object"
+                            string="استيراد من المقايسة"
+                            class="btn-secondary"
+                            invisible="state != 'draft' or not boq_id"/>
+                    <button name="action_pull_previous_certificate"
+                            type="object"
+                            string="جلب السابق من آخر مستخلص"
+                            class="btn-secondary"
+                            icon="fa-history"
+                            invisible="state != 'draft'"/>
+                    <button name="action_submit_engineering"
+                            type="object"
+                            string="إرسال للمراجعة الهندسية"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_pm_approve"
+                            type="object"
+                            string="اعتماد مدير المشروع"
+                            class="btn-success"
+                            groups="stm_construction_demo.group_stm_project_manager"
+                            invisible="state != 'site_engineer'"/>
+                    <button name="action_send_accounting"
+                            type="object"
+                            string="إرسال للمالية"
+                            class="btn-secondary"
+                            invisible="state != 'pm_approved'"/>
+                    <button name="action_create_account_move"
+                            type="object"
+                            string="إنشاء مسودة فاتورة مورد"
+                            class="btn-primary"
+                            icon="fa-file-text-o"
+                            invisible="certificate_type != 'vendor' or state not in ('pm_approved', 'accounting', 'paid') or move_id"/>
+                    <button name="action_create_account_move"
+                            type="object"
+                            string="إنشاء مسودة فاتورة عميل"
+                            class="btn-primary"
+                            icon="fa-file-text-o"
+                            invisible="certificate_type != 'customer' or state not in ('pm_approved', 'accounting', 'paid') or move_id"/>
+                    <button name="action_mark_paid"
+                            type="object"
+                            string="تسجيل الصرف / التحصيل"
+                            class="btn-success"
+                            groups="stm_construction_demo.group_stm_sales_finance"
+                            invisible="state != 'accounting'"/>
+                    <button name="action_reject"
+                            type="object"
+                            string="رفض المستخلص"
+                            class="btn-danger"
+                            invisible="state not in ('site_engineer', 'pm_approved', 'accounting')"/>
+                    <button name="action_print_certificate_pdf"
+                            type="object"
+                            string="طباعة المستخلص (PDF)"
+                            icon="fa-file-pdf-o"
+                            class="btn-secondary"/>
+                    <button name="action_reset_draft"
+                            type="object"
+                            string="إعادة لمسودة"
+                            invisible="state != 'rejected'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,site_engineer,pm_approved,accounting,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_account_move"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-money"
+                                invisible="not move_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">الفاتورة</span>
+                                <span class="o_stat_text">المحاسبية</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="alert alert-danger" role="alert" invisible="state != 'rejected'">
+                        <strong>مستخلص مرفوض:</strong>
+                        <field name="rejection_reason" readonly="1" class="oe_inline"/>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="المرجع"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <div class="d-flex gap-3 align-items-center mt-2">
+                            <field name="certificate_type" widget="radio" options="{'horizontal': True}"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="بيانات المستخلص والمشروع">
+                            <field name="certificate_no" placeholder="مثال: جاري رقم / 12"/>
+                            <field name="date"/>
+                            <field name="project_id"/>
+                            <field name="boq_id"/>
+                            <field name="partner_id"
+                                   string="المقاول"
+                                   invisible="certificate_type != 'vendor'"/>
+                            <field name="partner_id"
+                                   string="العميل الخارجي"
+                                   invisible="certificate_type != 'customer'"/>
+                            <field name="work_scope" placeholder="مثال: مصنعية أعمال العظم"/>
+                            <field name="currency_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="البيانات البنكية ومرجع العقد">
+                            <field name="contract_ref" placeholder="مثال: عقد مصنعية عظم / أمر شراء"/>
+                            <field name="subcontract_filename" invisible="1"/>
+                            <field name="subcontract_file" filename="subcontract_filename"/>
+                            <field name="bank_name" placeholder="مثال: مصرف الراجحي"/>
+                            <field name="bank_account_no"/>
+                            <field name="iban" placeholder="SA..."/>
+                        </group>
+                    </group>
+
+                    <group string="سبب الرفض (في حال الرفض)" invisible="state not in ('site_engineer', 'pm_approved', 'accounting', 'rejected')">
+                        <field name="rejection_reason" nolabel="1" colspan="2"
+                               placeholder="اذكر سبب الرفض عند رفض المستخلص..."/>
+                    </group>
+
+                    <notebook>
+                        <page name="cert_lines" string="بنود الأعمال والحصر والخلاصة">
+                            <field name="line_ids" widget="section_and_note_one2many">
+                                <list editable="bottom"
+                                      decoration-info="is_variation_order">
+                                    <control>
+                                        <create name="add_line_control" string="إضافة بند"/>
+                                        <create name="add_section_control" string="إضافة قسم" context="{'default_display_type': 'line_section'}"/>
+                                        <create name="add_note_control" string="إضافة ملاحظة" context="{'default_display_type': 'line_note'}"/>
+                                    </control>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="item_code" string="رقم"/>
+                                    <field name="name" widget="section_and_note_text"/>
+                                    <field name="is_variation_order" optional="show"/>
+                                    <field name="uom_name"/>
+                                    <field name="contract_qty"/>
+                                    <field name="unit_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="contract_total" widget="monetary" options="{'currency_field': 'currency_id'}" sum="التعاقد"/>
+                                    <field name="prev_qty"/>
+                                    <field name="prev_pct" string="% السابق"/>
+                                    <field name="prev_total" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" sum="السابق"/>
+                                    <field name="curr_qty"/>
+                                    <field name="curr_pct" string="% الحالي"/>
+                                    <field name="curr_total" widget="monetary" options="{'currency_field': 'currency_id'}" sum="الحالي"/>
+                                    <field name="cumul_qty" optional="show"/>
+                                    <field name="cumul_pct" string="% التراكمي"/>
+                                    <field name="cumul_total" widget="monetary" options="{'currency_field': 'currency_id'}" sum="التراكمي"/>
+                                    <field name="remaining_qty"/>
+                                    <field name="remaining_pct" optional="hide"/>
+                                    <field name="remaining_total" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" sum="المتبقي"/>
+                                </list>
+                            </field>
+
+                            <separator string="خلاصة المستخلص والاستقطاعات وضمان حسن الأداء"/>
+                            <group col="3">
+                                <group string="الإجماليات (السابق / الحالي / التراكمي)">
+                                    <field name="contract_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="prev_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="curr_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="cumul_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="remaining_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group string="محجوز الضمان والخصومات">
+                                    <field name="retention_percent"/>
+                                    <field name="retention_prev" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="retention_curr" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="retention_cumul" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="after_retention_curr" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="deduction_prev" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="deduction_curr" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="deduction_cumul" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group string="صافي المستحق ونسبة الإنجاز">
+                                    <field name="after_deduction_prev" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="after_deduction_curr" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="after_deduction_cumul" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="previously_paid" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="prev_settlement_diff" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="previously_paid == 0"/>
+                                    <field name="net_payable_curr"
+                                           class="oe_subtotal_footer_separator text-primary fw-bold fs-5"
+                                           widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="overall_progress_percent" widget="progressbar"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page name="approvals_notes" string="الاعتمادات والمحاسبة والملاحظات">
+                            <group>
+                                <group string="سجل الاعتمادات">
+                                    <field name="site_engineer_id"/>
+                                    <field name="pm_approved_by_id"/>
+                                    <field name="accounting_approved_by_id"/>
+                                </group>
+                                <group string="الربط المحاسبي">
+                                    <field name="move_id"/>
+                                    <field name="move_state" invisible="not move_id"/>
+                                </group>
+                            </group>
+                            <group string="ملاحظات المستخلص">
+                                <field name="notes" nolabel="1" colspan="2" placeholder="ملاحظات هندسية أو مالية..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Certificate Search View -->
+    <record id="view_construction_certificate_search" model="ir.ui.view">
+        <field name="name">construction.certificate.search</field>
+        <field name="model">construction.certificate</field>
+        <field name="arch" type="xml">
+            <search string="بحث في المستخلصات">
+                <field name="name"/>
+                <field name="certificate_no"/>
+                <field name="project_id"/>
+                <field name="partner_id"/>
+                <field name="work_scope"/>
+                <filter name="filter_vendor" string="مستخلصات المقاولين" domain="[('certificate_type', '=', 'vendor')]"/>
+                <filter name="filter_customer" string="مستخلصات العملاء" domain="[('certificate_type', '=', 'customer')]"/>
+                <separator/>
+                <filter name="filter_draft" string="مسودة" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_engineering" string="مراجعة هندسية" domain="[('state', '=', 'site_engineer')]"/>
+                <filter name="filter_pm_approved" string="معتمد من مدير المشروع" domain="[('state', '=', 'pm_approved')]"/>
+                <filter name="filter_accounting" string="مراجعة المالية" domain="[('state', '=', 'accounting')]"/>
+                <filter name="filter_paid" string="تم الصرف / التحصيل" domain="[('state', '=', 'paid')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_project" string="المشروع" context="{'group_by': 'project_id'}"/>
+                    <filter name="group_partner" string="المقاول / العميل" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_type" string="نوع المستخلص" context="{'group_by': 'certificate_type'}"/>
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Actions: Vendor vs Customer -->
+    <record id="action_construction_certificate_vendor" model="ir.actions.act_window">
+        <field name="name">مستخلصات المقاولين</field>
+        <field name="res_model">construction.certificate</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_construction_certificate_search"/>
+        <field name="domain">[('certificate_type', '=', 'vendor')]</field>
+        <field name="context">{'default_certificate_type': 'vendor'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ مستخلص مقاول / مقاول باطن جديد
+            </p>
+            <p>
+                سجّل كميات التعاقد والسابق والحالي مع الاحتساب الآلي للتراكمي والمتبقي ومحجوز الضمان 10% ومنع تجاوز الكميات التعاقدية.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_construction_certificate_customer" model="ir.actions.act_window">
+        <field name="name">مستخلصات العملاء</field>
+        <field name="res_model">construction.certificate</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_construction_certificate_search"/>
+        <field name="domain">[('certificate_type', '=', 'customer')]</field>
+        <field name="context">{'default_certificate_type': 'customer'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ مستخلص عميل خارجي جديد
+            </p>
+            <p>
+                أصدر مستخلصات العملاء لمشاريع المقاولات للغير مع الاحتساب الآلي لنسب الإنجاز ومحجوز الضمان وإنشاء مسودة فاتورة عميل بنقرة واحدة.
+            </p>
+        </field>
+    </record>
+
+    <!-- Inherit account.move Form: Bidirectional Smart Button to Certificate -->
+    <record id="view_account_move_form_stm_cert_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.stm.cert.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_stm_certificate"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-file-text-o"
+                        invisible="not stm_certificate_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">المستخلص</span>
+                        <span class="o_stat_text">المرتبط</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit project.project Form: Smart Button to Certificates -->
+    <record id="view_project_form_stm_cert_inherit" model="ir.ui.view">
+        <field name="name">project.project.form.stm.cert.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_stm_certificates"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-file-text-o">
+                    <field name="stm_certificate_count" widget="statinfo" string="المستخلصات"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit construction.boq Form: Smart Button to Certificates -->
+    <record id="view_construction_boq_form_stm_cert_inherit" model="ir.ui.view">
+        <field name="name">construction.boq.form.stm.cert.inherit</field>
+        <field name="model">construction.boq</field>
+        <field name="inherit_id" ref="stm_construction_demo.view_construction_boq_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_certificates"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-file-text-o">
+                    <field name="certificate_count" widget="statinfo" string="المستخلصات"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- === S2 Dual Menuitems === -->
+    <!-- 1. Executive Construction Hub -->
+    <menuitem id="menu_stm_certificate_vendor"
+              name="مستخلصات المقاولين"
+              parent="stm_construction_demo.menu_stm_certificates_root"
+              action="action_construction_certificate_vendor"
+              sequence="10"/>
+
+    <menuitem id="menu_stm_certificate_customer"
+              name="مستخلصات العملاء"
+              parent="stm_construction_demo.menu_stm_certificates_root"
+              action="action_construction_certificate_customer"
+              sequence="20"/>
+
+    <!-- 2. Native Project App -->
+    <menuitem id="menu_project_stm_certificate_vendor"
+              name="مستخلصات المقاولين"
+              parent="project.menu_main_pm"
+              action="action_construction_certificate_vendor"
+              sequence="37"/>
+
+    <menuitem id="menu_project_stm_certificate_customer"
+              name="مستخلصات العملاء"
+              parent="project.menu_main_pm"
+              action="action_construction_certificate_customer"
+              sequence="38"/>
+
+    <!-- 3. Native Accounting App (Vendors & Customers) -->
+    <menuitem id="menu_account_stm_certificate_vendor"
+              name="مستخلصات المقاولين"
+              parent="account.menu_finance_payables"
+              action="action_construction_certificate_vendor"
+              sequence="15"/>
+
+    <menuitem id="menu_account_stm_certificate_customer"
+              name="مستخلصات العملاء"
+              parent="account.menu_finance_receivables"
+              action="action_construction_certificate_customer"
+              sequence="15"/>
+</odoo>

@@ -38,6 +38,9 @@
         'views/site_request_views.xml',
         'report/boq_report.xml',
         # === S2 ===
+        'data/certificate_sequence.xml',
+        'views/certificate_views.xml',
+        'report/certificate_report.xml',
         # === S3 ===
         # === S4 ===
     ],

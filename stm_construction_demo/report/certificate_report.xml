@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_construction_certificate_landscape" model="report.paperformat">
+        <field name="name">تنسيق مستخلص الأعمال (A4 أفقي)</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">6</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_construction_certificate" model="ir.actions.report">
+        <field name="name">طباعة المستخلص (PDF)</field>
+        <field name="model">construction.certificate</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">stm_construction_demo.report_construction_certificate_document</field>
+        <field name="report_file">stm_construction_demo.report_construction_certificate_document</field>
+        <field name="paperformat_id" ref="paperformat_construction_certificate_landscape"/>
+        <field name="print_report_name">'Certificate - %s' % (object.certificate_no or object.name or 'Draft')</field>
+        <field name="binding_model_id" ref="model_construction_certificate"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_construction_certificate_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page" dir="rtl" style="direction: rtl; text-align: right; font-family: 'DejaVu Sans', sans-serif; font-size: 9.5px; color: #0f172a;">
+                        <!-- Header Banner -->
+                        <div style="background: #0f2942; color: #ffffff; padding: 10px 14px; border-radius: 5px; margin-bottom: 10px; border-bottom: 4px solid #c99738;">
+                            <table style="width: 100%; border-collapse: collapse; color: #ffffff;">
+                                <tr>
+                                    <td style="width: 55%; vertical-align: middle;">
+                                        <div style="font-size: 10px; color: #e2c275; margin-bottom: 2px;">
+                                            <t t-if="o.certificate_type == 'vendor'">مستخلص أعمال مقاول / مقاول باطن</t>
+                                            <t t-else="">مستخلص أعمال عميل خارجي</t>
+                                        </div>
+                                        <div style="font-size: 15px; font-weight: bold;">
+                                            <span t-out="o.certificate_no or o.name"/>
+                                            <t t-if="o.work_scope"> — <span t-out="o.work_scope"/></t>
+                                        </div>
+                                        <div style="font-size: 9.5px; margin-top: 3px;">
+                                            المرجع: <strong t-out="o.name"/>
+                                            | المشروع: <strong t-out="o.project_id.name"/>
+                                        </div>
+                                    </td>
+                                    <td style="width: 45%; text-align: left; vertical-align: middle;">
+                                        <table style="width: 100%; border-collapse: collapse; background: #1e3a5f; border-radius: 4px; color: #f8fafc; font-size: 9px;">
+                                            <tr>
+                                                <td style="padding: 4px 8px; text-align: right;"><strong>التاريخ:</strong> <span t-field="o.date"/></td>
+                                                <td style="padding: 4px 8px; text-align: right;"><strong>الحالة:</strong> <span t-field="o.state"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 4px 8px; text-align: right;">
+                                                    <strong><t t-if="o.certificate_type == 'vendor'">المقاول:</t><t t-else="">العميل:</t></strong>
+                                                    <span t-out="o.partner_id.name"/>
+                                                </td>
+                                                <td style="padding: 4px 8px; text-align: right;"><strong>العملة:</strong> <span t-out="o.currency_id.name"/></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Bank & Contract Meta Strip -->
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin-bottom: 9px; font-size: 9px; background: #f8fafc;">
+                            <tr>
+                                <td style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 25%;">
+                                    <strong>مرجع العقد:</strong> <span t-out="o.contract_ref or '-'"/>
+                                </td>
+                                <td style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 20%;">
+                                    <strong>البنك:</strong> <span t-out="o.bank_name or '-'"/>
+                                </td>
+                                <td style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 25%;">
+                                    <strong>رقم الحساب:</strong> <span t-out="o.bank_account_no or '-'"/>
+                                </td>
+                                <td style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 30%;">
+                                    <strong>الآيبان (IBAN):</strong> <span t-out="o.iban or '-'"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Excel-Style 5-Group Table -->
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #475569; margin-bottom: 10px; font-size: 8.5px;">
+                            <thead>
+                                <tr style="background: #0f2942; color: #ffffff;">
+                                    <th rowspan="2" style="padding: 4px 3px; border: 1px solid #475569; text-align: center; width: 3%;">رقم</th>
+                                    <th rowspan="2" style="padding: 4px 5px; border: 1px solid #475569; text-align: right; width: 20%;">وصف الأعمال</th>
+                                    <th rowspan="2" style="padding: 4px 3px; border: 1px solid #475569; text-align: center; width: 5%;">الوحدة</th>
+                                    <th colspan="3" style="padding: 4px 3px; border: 1px solid #475569; text-align: center; background: #1e3a5f;">التعاقد</th>
+                                    <th colspan="3" style="padding: 4px 3px; border: 1px solid #475569; text-align: center; background: #1e3a5f;">السابق</th>
+                                    <th colspan="3" style="padding: 4px 3px; border: 1px solid #475569; text-align: center; background: #1e40af;">الحالي</th>
+                                    <th colspan="3" style="padding: 4px 3px; border: 1px solid #475569; text-align: center; background: #0f766e;">الإجمالي التراكمي</th>
+                                    <th colspan="3" style="padding: 4px 3px; border: 1px solid #475569; text-align: center; background: #334155;">المتبقي</th>
+                                </tr>
+                                <tr style="background: #1e293b; color: #f8fafc; font-size: 8px;">
+                                    <!-- Contract -->
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">كمية</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">سعر</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">إجمالي</th>
+                                    <!-- Previous -->
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">كمية</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">%</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">إجمالي</th>
+                                    <!-- Current -->
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">كمية</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">%</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">إجمالي</th>
+                                    <!-- Cumulative -->
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">كمية</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">%</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">إجمالي</th>
+                                    <!-- Remaining -->
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">كمية</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">%</th>
+                                    <th style="padding: 3px 2px; border: 1px solid #475569; text-align: center;">إجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="row_idx" t-value="0"/>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <t t-if="line.display_type == 'line_section'">
+                                        <tr style="background: #e2e8f0; font-weight: bold; color: #0f2942;">
+                                            <td colspan="18" style="padding: 4px 6px; border: 1px solid #94a3b8; text-align: right;" t-out="line.name"/>
+                                        </tr>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_note'">
+                                        <tr style="background: #f8fafc; font-style: italic; color: #475569;">
+                                            <td colspan="18" style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: right;" t-out="line.name"/>
+                                        </tr>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-set="row_idx" t-value="row_idx + 1"/>
+                                        <tr t-att-style="'background: #f8fafc;' if row_idx % 2 == 0 else ''">
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: center;" t-out="line.item_code or row_idx"/>
+                                            <td style="padding: 3px 5px; border: 1px solid #cbd5e1;">
+                                                <span t-out="line.name"/>
+                                                <t t-if="line.is_variation_order">
+                                                    <span style="background: #dbeafe; color: #1e40af; padding: 1px 3px; border-radius: 2px; font-size: 7.5px;">تغييري</span>
+                                                </t>
+                                            </td>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: center;" t-out="line.uom_name or '-'"/>
+                                            <!-- Contract -->
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.contract_qty)"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.unit_price)"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.contract_total)"/>
+                                            <!-- Previous -->
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.prev_qty)"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: center;" t-out="('%.1f' % line.prev_pct) + '%'"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.prev_total)"/>
+                                            <!-- Current -->
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left; font-weight: bold;" t-out="'{:,.2f}'.format(line.curr_qty)"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: center;" t-out="('%.1f' % line.curr_pct) + '%'"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left; font-weight: bold;" t-out="'{:,.2f}'.format(line.curr_total)"/>
+                                            <!-- Cumulative -->
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.cumul_qty)"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: center;" t-out="('%.1f' % line.cumul_pct) + '%'"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.cumul_total)"/>
+                                            <!-- Remaining -->
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.remaining_qty)"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: center;" t-out="('%.1f' % line.remaining_pct) + '%'"/>
+                                            <td style="padding: 3px 2px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(line.remaining_total)"/>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background: #e2e8f0; font-weight: bold; color: #0f172a;">
+                                    <td colspan="3" style="padding: 4px 5px; border: 1px solid #475569;">الإجمالي (<span t-out="o.currency_id.name"/>)</td>
+                                    <td colspan="2" style="padding: 4px 2px; border: 1px solid #475569;"/>
+                                    <td style="padding: 4px 2px; border: 1px solid #475569; text-align: left;" t-out="'{:,.2f}'.format(o.contract_total)"/>
+                                    <td colspan="2" style="padding: 4px 2px; border: 1px solid #475569;"/>
+                                    <td style="padding: 4px 2px; border: 1px solid #475569; text-align: left;" t-out="'{:,.2f}'.format(o.prev_total)"/>
+                                    <td colspan="2" style="padding: 4px 2px; border: 1px solid #475569;"/>
+                                    <td style="padding: 4px 2px; border: 1px solid #475569; text-align: left; color: #1e40af;" t-out="'{:,.2f}'.format(o.curr_total)"/>
+                                    <td colspan="2" style="padding: 4px 2px; border: 1px solid #475569; text-align: center;" t-out="('%.1f' % o.overall_progress_percent) + '%'"/>
+                                    <td style="padding: 4px 2px; border: 1px solid #475569; text-align: left;" t-out="'{:,.2f}'.format(o.cumul_total)"/>
+                                    <td colspan="2" style="padding: 4px 2px; border: 1px solid #475569;"/>
+                                    <td style="padding: 4px 2px; border: 1px solid #475569; text-align: left;" t-out="'{:,.2f}'.format(o.remaining_total)"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- Summary & Retention Table + Overall Progress -->
+                        <div style="page-break-inside: avoid; margin-bottom: 12px;">
+                            <table style="width: 100%; border-collapse: collapse; border: 1px solid #475569; font-size: 9px;">
+                                <thead>
+                                    <tr style="background: #0f2942; color: #ffffff;">
+                                        <th style="padding: 4px 8px; border: 1px solid #475569; text-align: right; width: 40%;">خلاصة المستخلص والاستقطاعات</th>
+                                        <th style="padding: 4px 8px; border: 1px solid #475569; text-align: left; width: 20%;">السابق</th>
+                                        <th style="padding: 4px 8px; border: 1px solid #475569; text-align: left; width: 20%;">الجاري (الحالي)</th>
+                                        <th style="padding: 4px 8px; border: 1px solid #475569; text-align: left; width: 20%;">الإجمالي التراكمي</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1;">القيمة الإجمالية للأعمال المنجزة</td>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.prev_total)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.curr_total)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.cumul_total)"/>
+                                    </tr>
+                                    <tr style="background: #f8fafc;">
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1;">
+                                            يخصم محجوز ضمان حسن الأداء (<span t-out="('%.1f' % o.retention_percent) + '%'"/>)
+                                        </td>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left; color: #b45309;" t-out="'{:,.2f}'.format(o.retention_prev)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left; color: #b45309;" t-out="'{:,.2f}'.format(o.retention_curr)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left; color: #b45309;" t-out="'{:,.2f}'.format(o.retention_cumul)"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1;">القيمة الإجمالية بعد محجوز الضمان</td>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.after_retention_prev)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.after_retention_curr)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.after_retention_cumul)"/>
+                                    </tr>
+                                    <tr style="background: #f8fafc;">
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1;">إجمالي الخصومات والغرامات</td>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.deduction_prev)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.deduction_curr)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.deduction_cumul)"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1;">القيمة بعد الخصومات</td>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.after_deduction_prev)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.after_deduction_curr)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.after_deduction_cumul)"/>
+                                    </tr>
+                                    <tr style="background: #f8fafc;">
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1;">ما سبق صرفه حتى تاريخه</td>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.previously_paid)"/>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;">-</td>
+                                        <td style="padding: 4px 8px; border: 1px solid #cbd5e1; text-align: left;" t-out="'{:,.2f}'.format(o.previously_paid)"/>
+                                    </tr>
+                                    <tr style="background: #fef3c7; font-weight: bold; font-size: 10.5px;">
+                                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #0f2942;">
+                                            صافي المبلغ المستحق صرفه للمستخلص الجاري (<span t-out="o.currency_id.name"/>)
+                                        </td>
+                                        <td style="padding: 6px 8px; border: 1px solid #475569; text-align: left; font-size: 9px; color: #475569;">
+                                            نسبة الإنجاز الكلية: <strong t-out="('%.1f' % o.overall_progress_percent) + '%'"/>
+                                        </td>
+                                        <td colspan="2" style="padding: 6px 8px; border: 1px solid #475569; text-align: left; color: #0f2942;">
+                                            <span t-field="o.net_payable_curr" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 4 Approval Signature Blocks -->
+                        <div style="page-break-inside: avoid;">
+                            <table style="width: 100%; border-collapse: collapse; border: 1px solid #94a3b8; text-align: center; font-size: 9.5px;">
+                                <tr style="background: #f1f5f9;">
+                                    <th style="padding: 6px; border: 1px solid #94a3b8; width: 25%;">توقيع حاسب الكميات</th>
+                                    <th style="padding: 6px; border: 1px solid #94a3b8; width: 25%;">توقيع مدير المشاريع</th>
+                                    <th style="padding: 6px; border: 1px solid #94a3b8; width: 25%;">توقيع المدير العام</th>
+                                    <th style="padding: 6px; border: 1px solid #94a3b8; width: 25%;">توقيع المالية</th>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 18px 6px 8px 6px; border: 1px solid #94a3b8; height: 48px; vertical-align: bottom;">
+                                        <div style="color: #475569; font-size: 8.5px;" t-out="o.site_engineer_id.name or '........................'"/>
+                                    </td>
+                                    <td style="padding: 18px 6px 8px 6px; border: 1px solid #94a3b8; height: 48px; vertical-align: bottom;">
+                                        <div style="color: #475569; font-size: 8.5px;" t-out="o.pm_approved_by_id.name or '........................'"/>
+                                    </td>
+                                    <td style="padding: 18px 6px 8px 6px; border: 1px solid #94a3b8; height: 48px; vertical-align: bottom;">
+                                        <div style="color: #475569; font-size: 8.5px;">........................</div>
+                                    </td>
+                                    <td style="padding: 18px 6px 8px 6px; border: 1px solid #94a3b8; height: 48px; vertical-align: bottom;">
+                                        <div style="color: #475569; font-size: 8.5px;" t-out="o.accounting_approved_by_id.name or '........................'"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
