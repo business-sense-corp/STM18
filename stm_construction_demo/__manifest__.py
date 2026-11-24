@@ -42,6 +42,12 @@
         'views/certificate_views.xml',
         'report/certificate_report.xml',
         # === S3 ===
+        'data/booking_sequence.xml',
+        'data/s3_default_data.xml',
+        'views/unit_cost_views.xml',
+        'views/real_estate_views.xml',
+        'views/online_booking_views.xml',
+        'views/dashboard_views.xml',
         # === S4 ===
     ],
     'assets': {
@@ -49,6 +55,9 @@
             # === S1 ===
             # === S2 ===
             # === S3 ===
+            'stm_construction_demo/static/src/dashboard/dashboard.scss',
+            'stm_construction_demo/static/src/dashboard/dashboard.js',
+            'stm_construction_demo/static/src/dashboard/dashboard.xml',
             # === S4 ===
         ],
     },

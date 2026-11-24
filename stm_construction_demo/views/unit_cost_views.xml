@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- construction.unit.cost List View -->
+    <record id="view_construction_unit_cost_list" model="ir.ui.view">
+        <field name="name">construction.unit.cost.list</field>
+        <field name="model">construction.unit.cost</field>
+        <field name="arch" type="xml">
+            <list string="بطاقات تكلفة وربحية البلوك">
+                <field name="name"/>
+                <field name="project_id" optional="show"/>
+                <field name="units_count"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="block_budget" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="block_actual" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="block_etc" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="block_eac" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="unit_expected_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="unit_net_sale_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="unit_expected_margin" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="unit_expected_margin_pct" string="الهامش %"/>
+                <field name="is_featured" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- construction.unit.cost Form View -->
+    <record id="view_construction_unit_cost_form" model="ir.ui.view">
+        <field name="name">construction.unit.cost.form</field>
+        <field name="model">construction.unit.cost</field>
+        <field name="arch" type="xml">
+            <form string="بطاقة تكلفة وربحية البلوك والوحدة">
+                <sheet>
+                    <widget name="web_ribbon" title="معروض بلوحة الإدارة" bg_color="text-bg-success"
+                            invisible="not is_featured"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="مثال: بلوك إشراقات السكني — 10 وحدات"/></h1>
+                    </div>
+                    <div class="alert alert-warning mb-3" role="alert">
+                        <strong>قاعدة محاسبية:</strong>
+                        <field name="accounting_note" nolabel="1" class="d-inline ms-2 fw-bold"/>
+                    </div>
+                    <group>
+                        <group string="بيانات البلوك والمشروع">
+                            <field name="project_id"/>
+                            <field name="units_count"/>
+                            <field name="currency_id"/>
+                            <field name="is_featured"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="تكلفة البلوك الكاملة (قابلة للتعديل)">
+                            <field name="block_budget" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="block_actual" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="block_etc" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="block_eac" widget="monetary" options="{'currency_field': 'currency_id'}" class="fw-bold"/>
+                            <field name="block_variance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="block_variance_pct"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="تكلفة الوحدة الواحدة (محسوبة ديناميكياً)">
+                            <field name="unit_planned_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="unit_actual_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="unit_expected_cost" widget="monetary" options="{'currency_field': 'currency_id'}" class="fw-bold"/>
+                        </group>
+                        <group string="سعر البيع، التحصيل والهامش المتوقع">
+                            <field name="unit_net_sale_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="unit_cash_collected" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="unit_cash_collected_pct"/>
+                            <field name="unit_remaining_receivable" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="unit_expected_margin" widget="monetary" options="{'currency_field': 'currency_id'}" class="text-success fw-bold"/>
+                            <field name="unit_expected_margin_pct" class="text-success fw-bold"/>
+                        </group>
+                    </group>
+                    <group string="ملاحظات">
+                        <field name="notes" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_construction_unit_cost" model="ir.actions.act_window">
+        <field name="name">بطاقات تكلفة وربحية البلوك</field>
+        <field name="res_model">construction.unit.cost</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_stm_unit_cost"
+              name="بطاقات تكلفة وربحية البلوك"
+              parent="stm_construction_demo.menu_stm_real_estate_root"
+              action="action_construction_unit_cost"
+              sequence="30"/>
+
+    <!-- construction.kpi.config List & Form Views -->
+    <record id="view_construction_kpi_config_list" model="ir.ui.view">
+        <field name="name">construction.kpi.config.list</field>
+        <field name="model">construction.kpi.config</field>
+        <field name="arch" type="xml">
+            <list string="إعدادات لوحة الإدارة والسيولة">
+                <field name="name"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="cash_inflow_expected" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="cash_outflow_expected" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="cash_deficit_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="escrow_balance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="saudization_rate"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_construction_kpi_config_form" model="ir.ui.view">
+        <field name="name">construction.kpi.config.form</field>
+        <field name="model">construction.kpi.config</field>
+        <field name="arch" type="xml">
+            <form string="إعدادات لوحة الإدارة والسيولة">
+                <sheet>
+                    <widget name="web_ribbon" title="إعدادات محاكاة اللوحة" bg_color="text-bg-warning"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="الرقابة على المواد والهالك (SAR)">
+                            <field name="currency_id"/>
+                            <field name="materials_planned_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="materials_consumed_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="materials_waste_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="materials_waste_pct"/>
+                        </group>
+                        <group string="موقف السيولة المتوقع (60 يوماً)">
+                            <field name="cash_inflow_expected" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="cash_outflow_expected" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="cash_deficit_amount" widget="monetary" options="{'currency_field': 'currency_id'}" class="text-danger fw-bold"/>
+                            <field name="overdue_installments_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="مؤشرات تنظيمية (محاكاة استعراضية)">
+                            <field name="escrow_balance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="saudization_rate"/>
+                        </group>
+                        <group string="توصية المساعد الذكي للسيولة">
+                            <field name="ai_liquidity_recommendation" nolabel="1" colspan="2"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_construction_kpi_config" model="ir.actions.act_window">
+        <field name="name">إعدادات لوحة الإدارة والسيولة</field>
+        <field name="res_model">construction.kpi.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_stm_kpi_config"
+              name="إعدادات لوحة الإدارة والسيولة"
+              parent="stm_construction_demo.menu_stm_settings_root"
+              action="action_construction_kpi_config"
+              sequence="10"/>
+</odoo>

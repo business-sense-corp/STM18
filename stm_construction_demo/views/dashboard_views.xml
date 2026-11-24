@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_stm_construction_dashboard" model="ir.actions.client">
+        <field name="name">لوحة الإدارة والمساعد الذكي</field>
+        <field name="tag">stm_construction_dashboard</field>
+    </record>
+
+    <!-- Sequence 1: Default Landing Screen for المقاولات والإدارة -->
+    <menuitem id="menu_stm_dashboard"
+              name="لوحة الإدارة والمساعد الذكي"
+              parent="stm_construction_demo.menu_stm_construction_root"
+              action="action_stm_construction_dashboard"
+              sequence="1"/>
+</odoo>

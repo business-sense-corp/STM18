@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="unit_cost_default_block_10" model="construction.unit.cost">
+            <field name="name">بلوك إشراقات السكني — 10 وحدات</field>
+            <field name="is_featured" eval="True"/>
+            <field name="units_count">10</field>
+            <field name="block_budget">3000000.0</field>
+            <field name="block_actual">1800000.0</field>
+            <field name="block_etc">1500000.0</field>
+            <field name="unit_net_sale_price">400000.0</field>
+            <field name="unit_cash_collected">100000.0</field>
+            <field name="accounting_note">ملاحظة محاسبية: التحصيل النقدي لا يساوي ربحاً محققاً (الأرقام قبل الضرائب).</field>
+            <field name="notes">النموذج القياسي لربط تكلفة البلوك (10 وحدات) بسعر بيع الوحدة الواحدة: ميزانية 3.0M، منصرف 1.8M، إكمال 1.5M، إجمالي متوقع 3.3M (330 ألف/وحدة) مقابل بيع 400 ألف → هامش 70 ألف (17.5%).</field>
+        </record>
+
+        <record id="kpi_config_default" model="construction.kpi.config">
+            <field name="name">إعدادات لوحة الإدارة والسيولة</field>
+            <field name="materials_planned_cost">1200000.0</field>
+            <field name="materials_consumed_cost">940000.0</field>
+            <field name="materials_waste_cost">48000.0</field>
+            <field name="cash_inflow_expected">1450000.0</field>
+            <field name="cash_outflow_expected">1980000.0</field>
+            <field name="overdue_installments_amount">320000.0</field>
+            <field name="escrow_balance">1850000.0</field>
+            <field name="saudization_rate">34.5</field>
+            <field name="ai_liquidity_recommendation">تسريع تحصيل أقساط الوحدات الجاهزة (320,000 ر.س متأخرة)، إيداع شيكات PDC المستحقة هذا الأسبوع، وإعادة جدولة صرف مستخلصين غير حرجين لتغطية الفجوة النقدية خلال 60 يوماً.</field>
+        </record>
+    </data>
+</odoo>
