@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-Level Executive Construction Hub App -->
+    <menuitem id="menu_stm_construction_root"
+              name="المقاولات والإدارة"
+              web_icon="stm_construction_demo,static/description/icon.png"
+              sequence="5"/>
+
+    <!-- Top-Level Submenu Categories -->
+    <menuitem id="menu_stm_projects_boq_root"
+              name="المقايسات والمشاريع"
+              parent="menu_stm_construction_root"
+              sequence="20"/>
+
+    <!-- Placeholder action in S0 so the top-level app icon renders in the Odoo 18 App Switcher -->
+    <menuitem id="menu_stm_projects_overview"
+              name="المشاريع التنفيذية"
+              parent="menu_stm_projects_boq_root"
+              action="project.open_view_project_all"
+              sequence="5"/>
+
+    <menuitem id="menu_stm_certificates_root"
+              name="المستخلصات"
+              parent="menu_stm_construction_root"
+              sequence="30"/>
+
+    <menuitem id="menu_stm_real_estate_root"
+              name="العقارات والحجز"
+              parent="menu_stm_construction_root"
+              sequence="40"/>
+
+    <menuitem id="menu_stm_settings_root"
+              name="الإعدادات والديمو"
+              parent="menu_stm_construction_root"
+              sequence="90"/>
+
+    <!-- === S1 === -->
+    <!-- === S2 === -->
+    <!-- === S3 === -->
+    <!-- === S4 === -->
+</odoo>

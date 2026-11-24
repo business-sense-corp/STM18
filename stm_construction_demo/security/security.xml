@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_stm_construction" model="ir.module.category">
+        <field name="name">المقاولات والتطوير العقاري</field>
+        <field name="description">صلاحيات ديمو المقاولات والمستخلصات والتطوير العقاري</field>
+        <field name="sequence">35</field>
+    </record>
+
+    <!-- 1. Site Engineer -->
+    <record id="group_stm_site_engineer" model="res.groups">
+        <field name="name">مهندس الموقع</field>
+        <field name="category_id" ref="module_category_stm_construction"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- 2. Project Manager & Operations -->
+    <record id="group_stm_project_manager" model="res.groups">
+        <field name="name">مدير المشروع والعمليات</field>
+        <field name="category_id" ref="module_category_stm_construction"/>
+        <field name="implied_ids" eval="[(4, ref('group_stm_site_engineer'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- 3. Sales & Finance -->
+    <record id="group_stm_sales_finance" model="res.groups">
+        <field name="name">المبيعات والمالية</field>
+        <field name="category_id" ref="module_category_stm_construction"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>
