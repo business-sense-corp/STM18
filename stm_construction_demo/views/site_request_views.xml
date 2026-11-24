@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Site Request List View -->
+    <record id="view_construction_site_request_list" model="ir.ui.view">
+        <field name="name">construction.site.request.list</field>
+        <field name="model">construction.site.request</field>
+        <field name="arch" type="xml">
+            <list string="طلبات مواد الموقع"
+                  decoration-danger="state == 'rejected'"
+                  decoration-success="state == 'done'"
+                  decoration-info="state == 'approved'"
+                  decoration-warning="state == 'submitted'">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="project_id"/>
+                <field name="boq_id" optional="show"/>
+                <field name="delivery_mode" widget="badge"
+                       decoration-primary="delivery_mode == 'direct_site'"
+                       decoration-info="delivery_mode == 'from_main_wh'"
+                       decoration-warning="delivery_mode == 'site_consumption'"/>
+                <field name="vendor_id" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="total_estimated_cost" widget="monetary" options="{'currency_field': 'currency_id'}" sum="الإجمالي"/>
+                <field name="requested_by_id" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-info="state == 'approved'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Site Request Form View -->
+    <record id="view_construction_site_request_form" model="ir.ui.view">
+        <field name="name">construction.site.request.form</field>
+        <field name="model">construction.site.request</field>
+        <field name="arch" type="xml">
+            <form string="طلب مواد الموقع">
+                <header>
+                    <button name="action_submit"
+                            type="object"
+                            string="إرسال للاعتماد"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve"
+                            type="object"
+                            string="اعتماد مدير المشروع"
+                            class="btn-success"
+                            groups="stm_construction_demo.group_stm_project_manager"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_reject"
+                            type="object"
+                            string="رفض الطلب"
+                            class="btn-danger"
+                            groups="stm_construction_demo.group_stm_project_manager"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_create_rfq"
+                            type="object"
+                            string="إنشاء طلب شراء (RFQ)"
+                            class="btn-primary"
+                            icon="fa-shopping-cart"
+                            invisible="state != 'approved' or purchase_order_id"/>
+                    <button name="action_create_stock_picking"
+                            type="object"
+                            string="إنشاء إذن تحويل/صرف مخزني"
+                            class="btn-secondary"
+                            icon="fa-exchange"
+                            invisible="state != 'approved' or picking_id"/>
+                    <button name="action_reset_draft"
+                            type="object"
+                            string="إعادة لمسودة"
+                            invisible="state not in ('submitted', 'rejected')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_order"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-cart"
+                                invisible="not purchase_order_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">طلب الشراء</span>
+                                <span class="o_stat_text">RFQ</span>
+                            </div>
+                        </button>
+                        <button name="action_view_picking"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-exchange"
+                                invisible="not picking_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">الإذن المخزني</span>
+                                <span class="o_stat_text">تحويل / صرف</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="alert alert-info" role="alert" invisible="delivery_mode != 'from_main_wh'">
+                        <strong>آلية النقل المخزني:</strong>
+                        تحويل من المخزن الرئيسي إلى موقع المشروع — يُسجّل كحركة <strong>نقل مخزني (وليس استهلاكاً فعلياً)</strong>.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="delivery_mode != 'site_consumption'">
+                        <strong>آلية الاستهلاك الفعلي:</strong>
+                        صرف مواد للاستهلاك المباشر بالموقع — يُسجّل كـ <strong>استهلاك فعلي نهائي</strong> على المشروع.
+                    </div>
+                    <div class="alert alert-success" role="alert" invisible="delivery_mode != 'direct_site'">
+                        <strong>آلية الشراء المباشر:</strong>
+                        توريد وشراء مباشر من المورد إلى موقع المشروع عبر طلب شراء (RFQ).
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="رقم الطلب"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="بيانات المشروع والتوريد">
+                            <field name="project_id"/>
+                            <field name="boq_id"/>
+                            <field name="delivery_mode"/>
+                            <field name="vendor_id"/>
+                            <field name="currency_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="الاعتماد والتنفيذ">
+                            <field name="request_date"/>
+                            <field name="requested_by_id"/>
+                            <field name="approved_by_id"/>
+                            <field name="purchase_order_id" invisible="not purchase_order_id"/>
+                            <field name="picking_id" invisible="not picking_id"/>
+                            <field name="total_estimated_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+
+                    <group string="سبب الرفض" invisible="state not in ('submitted', 'rejected')">
+                        <field name="rejection_reason" nolabel="1" colspan="2"
+                               placeholder="اكتب سبب الرفض في حال رفض الطلب من مدير المشروع..."/>
+                    </group>
+
+                    <notebook>
+                        <page name="request_lines" string="بنود المواد المطلوبة">
+                            <field name="line_ids" widget="one2many_list">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="qty"/>
+                                    <field name="uom_id"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="estimated_unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="estimated_subtotal" widget="monetary" options="{'currency_field': 'currency_id'}" sum="الإجمالي التقديري"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="notes_tab" string="ملاحظات إضافية">
+                            <field name="notes" placeholder="ملاحظات المهندس أو أمين المستودع..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Site Request Search View -->
+    <record id="view_construction_site_request_search" model="ir.ui.view">
+        <field name="name">construction.site.request.search</field>
+        <field name="model">construction.site.request</field>
+        <field name="arch" type="xml">
+            <search string="بحث في طلبات المواد">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="vendor_id"/>
+                <filter name="filter_submitted" string="بانتظار الاعتماد" domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_approved" string="معتمد" domain="[('state', '=', 'approved')]"/>
+                <separator/>
+                <filter name="filter_transfer" string="نقل من المخزن الرئيسي" domain="[('delivery_mode', '=', 'from_main_wh')]"/>
+                <filter name="filter_consumption" string="استهلاك فعلي بالموقع" domain="[('delivery_mode', '=', 'site_consumption')]"/>
+                <filter name="filter_direct" string="شراء مباشر للموقع" domain="[('delivery_mode', '=', 'direct_site')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_project" string="المشروع" context="{'group_by': 'project_id'}"/>
+                    <filter name="group_mode" string="الآلية" context="{'group_by': 'delivery_mode'}"/>
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Site Request Action -->
+    <record id="action_construction_site_request" model="ir.actions.act_window">
+        <field name="name">طلبات مواد الموقع</field>
+        <field name="res_model">construction.site.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_construction_site_request_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ طلب مواد موقع جديد
+            </p>
+            <p>
+                ارفع طلب المواد من الموقع، ثم اعتمده من مدير المشروع لتحويله إلى طلب شراء (RFQ) أو إذن نقل/استهلاك مخزني.
+            </p>
+        </field>
+    </record>
+
+    <!-- S1 Menuitems for Site Requests (Hub + Native Project Menu) -->
+    <menuitem id="menu_stm_site_request"
+              name="طلبات مواد الموقع"
+              parent="stm_construction_demo.menu_stm_projects_boq_root"
+              action="action_construction_site_request"
+              sequence="20"/>
+
+    <menuitem id="menu_project_stm_site_request"
+              name="طلبات مواد الموقع"
+              parent="project.menu_main_pm"
+              action="action_construction_site_request"
+              sequence="36"/>
+</odoo>
