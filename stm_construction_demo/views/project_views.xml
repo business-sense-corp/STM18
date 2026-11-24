@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit project.project Form View -->
+    <record id="view_project_form_stm_inherit" model="ir.ui.view">
+        <field name="name">project.project.form.stm.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_stm_boq"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-calculator"
+                        invisible="not stm_boq_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">المقايسة</span>
+                        <span class="o_stat_text">(BOQ)</span>
+                    </div>
+                </button>
+                <button name="action_view_stm_site_requests"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-truck">
+                    <field name="stm_site_request_count" widget="statinfo" string="طلبات مواد الموقع"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="stm_construction_tab" string="بيانات المقاولات والتأخير">
+                    <field name="stm_currency_id" invisible="1"/>
+                    <group>
+                        <group string="ربط المقايسة والتأخير">
+                            <field name="stm_boq_id" readonly="1"/>
+                            <field name="stm_project_type"/>
+                            <field name="stm_delay_days"/>
+                            <field name="stm_delay_reason" placeholder="اذكر سبب تأخير المشروع أو المرحلة..."/>
+                        </group>
+                        <group string="مؤشرات الإنجاز والتكلفة">
+                            <field name="stm_progress_planned"/>
+                            <field name="stm_progress_actual" widget="progressbar"/>
+                            <field name="stm_budget_planned" widget="monetary" options="{'currency_field': 'stm_currency_id'}"/>
+                            <field name="stm_cost_actual" widget="monetary" options="{'currency_field': 'stm_currency_id'}"/>
+                            <field name="stm_cost_etc" widget="monetary" options="{'currency_field': 'stm_currency_id'}"/>
+                        </group>
+                    </group>
+                    <group string="المعدات والآليات بالموقع">
+                        <field name="stm_equipment_summary" nolabel="1" colspan="2"
+                               placeholder="ملخص المعدات والآليات العاملة بالموقع..."/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit project.task Form View -->
+    <record id="view_project_task_form_stm_inherit" model="ir.ui.view">
+        <field name="name">project.task.form.stm.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="stm_execution_tab" string="تنفيذ المقايسة والتأخير">
+                    <group>
+                        <group string="كميات التنفيذ والإنجاز">
+                            <field name="stm_boq_line_id" readonly="1"/>
+                            <field name="stm_planned_qty"/>
+                            <field name="stm_executed_qty"/>
+                            <field name="stm_progress_percent" widget="progressbar"/>
+                        </group>
+                        <group string="متابعة التأخير">
+                            <field name="stm_is_delayed"/>
+                            <field name="stm_delay_days" invisible="not stm_is_delayed and stm_delay_days == 0"/>
+                            <field name="stm_delay_reason" invisible="not stm_is_delayed and not stm_delay_reason"
+                                   placeholder="مثال: تأخر توريد شحنة البورسلان"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit project.task List View -->
+    <record id="view_project_task_list_stm_inherit" model="ir.ui.view">
+        <field name="name">project.task.list.stm.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="after">
+                <field name="stm_planned_qty" optional="hide"/>
+                <field name="stm_executed_qty" optional="hide"/>
+                <field name="stm_progress_percent" string="الإنجاز %" optional="show"/>
+                <field name="stm_is_delayed" string="متأخرة" optional="show"/>
+                <field name="stm_delay_days" string="أيام التأخير" optional="show"
+                       decoration-danger="stm_delay_days &gt; 0"/>
+                <field name="stm_delay_reason" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

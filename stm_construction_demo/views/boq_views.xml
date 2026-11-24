@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- BOQ List View -->
+    <record id="view_construction_boq_list" model="ir.ui.view">
+        <field name="name">construction.boq.list</field>
+        <field name="model">construction.boq</field>
+        <field name="arch" type="xml">
+            <list string="المقايسات وبطاقات المشاريع (BOQ)"
+                  decoration-danger="is_early_cost_alert or is_over_budget"
+                  decoration-warning="delay_days &gt; 0 and not is_early_cost_alert">
+                <field name="name"/>
+                <field name="project_name"/>
+                <field name="project_type" widget="badge"
+                       decoration-info="project_type == 'off_plan'"
+                       decoration-success="project_type == 'ready'"
+                       decoration-primary="project_type == 'contracting'"/>
+                <field name="location" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="total_planned" widget="monetary" options="{'currency_field': 'currency_id'}" sum="إجمالي المخطط"/>
+                <field name="total_actual" widget="monetary" options="{'currency_field': 'currency_id'}" sum="إجمالي الفعلي"/>
+                <field name="total_eac" widget="monetary" options="{'currency_field': 'currency_id'}" sum="إجمالي EAC"/>
+                <field name="budget_variance" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show"/>
+                <field name="progress_percent" string="الإنجاز %" widget="progressbar"/>
+                <field name="cost_burn_percent" string="الصرف %" optional="show"/>
+                <field name="delay_days" string="التأخير (يوم)" optional="show"
+                       decoration-danger="delay_days &gt; 0"/>
+                <field name="is_early_cost_alert" string="تنبيه مبكر" optional="show" widget="boolean"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-info="state == 'confirmed'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- BOQ Form View -->
+    <record id="view_construction_boq_form" model="ir.ui.view">
+        <field name="name">construction.boq.form</field>
+        <field name="model">construction.boq</field>
+        <field name="arch" type="xml">
+            <form string="المقايسة وبطاقة المشروع">
+                <header>
+                    <button name="action_confirm_create_project"
+                            type="object"
+                            string="اعتماد وإنشاء المشروع"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_confirm_create_project"
+                            type="object"
+                            string="تحديث ومزامنة المهام"
+                            class="btn-secondary"
+                            invisible="state == 'draft'"/>
+                    <button name="action_populate_standard_scope"
+                            type="object"
+                            string="تعبئة البنود القياسية (21 بند)"
+                            class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_populate_standard_documents"
+                            type="object"
+                            string="تعبئة قائمة المستندات القياسية"
+                            class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_set_in_progress"
+                            type="object"
+                            string="بدء التنفيذ"
+                            class="btn-secondary"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_set_done"
+                            type="object"
+                            string="إتمام المشروع"
+                            class="btn-success"
+                            invisible="state not in ('confirmed', 'in_progress')"/>
+                    <button name="action_print_boq_pdf"
+                            type="object"
+                            string="طباعة المقايسة (PDF)"
+                            icon="fa-file-pdf-o"
+                            class="btn-secondary"/>
+                    <button name="action_reset_draft"
+                            type="object"
+                            string="إعادة لمسودة"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_project"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-building"
+                                invisible="not project_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">المشروع</span>
+                                <span class="o_stat_text">التنفيذي</span>
+                            </div>
+                        </button>
+                        <button name="action_view_tasks"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-tasks"
+                                invisible="not project_id">
+                            <field name="task_count" widget="statinfo" string="المهام والمراحل"/>
+                        </button>
+                        <button name="action_view_site_requests"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <field name="site_request_count" widget="statinfo" string="طلبات مواد الموقع"/>
+                        </button>
+                    </div>
+
+                    <div class="alert alert-danger" role="alert" invisible="not is_early_cost_alert">
+                        <strong>تنبيه تكلفة مبكر:</strong>
+                        نسبة الإنجاز الفعلي (<field name="progress_percent" readonly="1" class="oe_inline"/>%)
+                        مقابل نسبة الصرف (<field name="cost_burn_percent" readonly="1" class="oe_inline"/>%) تشير إلى خطر تجاوز الميزانية قبل إتمام المشروع!
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="is_early_cost_alert or not is_over_budget">
+                        <strong>تنبيه ميزانية:</strong>
+                        التكلفة النهائية المتوقعة (EAC) تتجاوز الميزانية المخططة للمشروع.
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="رقم المقايسة"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <label for="project_name" string="اسم المشروع"/>
+                        <h2>
+                            <field name="project_name" placeholder="مثال: مشروع إشراقات الحجاز — مخطط شمس العروس 1"/>
+                        </h2>
+                    </div>
+
+                    <group>
+                        <group string="البيانات الأساسية">
+                            <field name="project_type"/>
+                            <field name="location" placeholder="المدينة / الحي / المخطط"/>
+                            <field name="project_id" readonly="1" invisible="not project_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id"/>
+                        </group>
+                        <group string="الجدول الزمني والتأخير">
+                            <field name="date_start_planned"/>
+                            <field name="date_start_actual"/>
+                            <field name="date_end_planned"/>
+                            <field name="date_end_expected"/>
+                            <field name="delay_days"/>
+                            <field name="delay_reason" placeholder="اذكر سبب التأخير إن وجد..."/>
+                        </group>
+                    </group>
+
+                    <!-- Financial & Progress KPI Summary -->
+                    <group string="ملخص التكاليف والميزانية والإنجاز">
+                        <group>
+                            <field name="total_planned" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_actual" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_committed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_etc" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                        <group>
+                            <field name="total_eac" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="budget_variance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="progress_percent" widget="progressbar"/>
+                            <field name="cost_burn_percent"/>
+                            <field name="is_over_budget" invisible="1"/>
+                            <field name="is_early_cost_alert" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page name="boq_lines" string="بنود المقايسة والتكاليف (BOQ)">
+                            <field name="line_ids">
+                                <list editable="bottom"
+                                      decoration-muted="not included"
+                                      decoration-info="is_variation_order"
+                                      decoration-danger="variance_amount &gt; 0">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="included"/>
+                                    <field name="is_variation_order" optional="show"/>
+                                    <field name="scope_category"/>
+                                    <field name="name"/>
+                                    <field name="uom_name"/>
+                                    <field name="planned_qty"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="unit_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="planned_amount" widget="monetary" options="{'currency_field': 'currency_id'}" sum="المخطط"/>
+                                    <field name="actual_amount" widget="monetary" options="{'currency_field': 'currency_id'}" sum="الفعلي"/>
+                                    <field name="committed_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" sum="الالتزامات"/>
+                                    <field name="etc_amount" widget="monetary" options="{'currency_field': 'currency_id'}" sum="الإكمال"/>
+                                    <field name="eac_amount" widget="monetary" options="{'currency_field': 'currency_id'}" sum="EAC"/>
+                                    <field name="variance_amount" widget="monetary" options="{'currency_field': 'currency_id'}" sum="الانحراف"/>
+                                    <field name="progress_percent" string="الإنجاز %"/>
+                                    <field name="subtasks_count" optional="hide"/>
+                                    <field name="task_id" optional="show" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page name="project_specs" string="وصف المشروع">
+                            <group>
+                                <group string="المساحات (م²)">
+                                    <field name="land_area"/>
+                                    <field name="building_area"/>
+                                    <field name="total_built_area"/>
+                                    <field name="floors_count"/>
+                                </group>
+                                <group string="مكونات المشروع والوحدات">
+                                    <field name="residential_units_count"/>
+                                    <field name="commercial_shops_count"/>
+                                    <field name="parking_slots_count"/>
+                                    <field name="electricity_meters_count"/>
+                                </group>
+                            </group>
+                            <group string="الملاحظات والتعليقات">
+                                <field name="notes" nolabel="1" colspan="2" placeholder="أدخل أي ملاحظات فنية أو إدارية على المشروع..."/>
+                            </group>
+                        </page>
+
+                        <page name="parties_crew" string="أطراف المشروع والطاقم والمعدات">
+                            <group>
+                                <group string="أطراف المشروع">
+                                    <field name="owner_id"/>
+                                    <field name="consultant_id"/>
+                                    <field name="designer_id"/>
+                                    <field name="insurance_company_id"/>
+                                    <field name="official_authority_id"/>
+                                </group>
+                                <group string="طاقم المشروع">
+                                    <field name="project_manager_id"/>
+                                    <field name="project_engineer_id"/>
+                                    <field name="supervisor_id"/>
+                                    <field name="technicians_count"/>
+                                    <field name="workers_count"/>
+                                </group>
+                            </group>
+                            <group string="الموردون ومقاولو الباطن">
+                                <field name="vendor_ids" widget="many2many_tags" nolabel="1" colspan="2"/>
+                            </group>
+                            <group string="المعدات والآليات بالموقع">
+                                <field name="equipment_summary" nolabel="1" colspan="2" placeholder="مثال: رافعة برجية (1)، خلاطة مركزية (1)، بوكلين وحفار (2)، هزاز خرسانة (4)..."/>
+                            </group>
+                        </page>
+
+                        <page name="official_documents" string="المستندات والمرفقات الرسمية">
+                            <group col="3">
+                                <field name="docs_total_count"/>
+                                <field name="docs_uploaded_count"/>
+                                <field name="docs_pending_count"/>
+                            </group>
+                            <field name="document_line_ids">
+                                <list editable="bottom"
+                                      decoration-success="status == 'approved'"
+                                      decoration-info="status == 'uploaded'"
+                                      decoration-warning="required and status == 'pending'">
+                                    <field name="category"/>
+                                    <field name="name"/>
+                                    <field name="required"/>
+                                    <field name="status" widget="badge"
+                                           decoration-warning="status == 'pending'"
+                                           decoration-info="status == 'uploaded'"
+                                           decoration-success="status == 'approved'"/>
+                                    <field name="attachment_filename" string="اسم الملف" optional="show" readonly="1"/>
+                                    <field name="attachment_file" filename="attachment_filename" string="المرفق"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- BOQ Search View -->
+    <record id="view_construction_boq_search" model="ir.ui.view">
+        <field name="name">construction.boq.search</field>
+        <field name="model">construction.boq</field>
+        <field name="arch" type="xml">
+            <search string="بحث في المقايسات">
+                <field name="name"/>
+                <field name="project_name"/>
+                <field name="location"/>
+                <field name="owner_id"/>
+                <filter name="filter_delayed" string="مشاريع متأخرة" domain="[('delay_days', '&gt;', 0)]"/>
+                <filter name="filter_early_alert" string="تنبيه تكلفة مبكر (70%/90%)" domain="[('is_early_cost_alert', '=', True)]"/>
+                <filter name="filter_over_budget" string="تجاوز الميزانية" domain="[('is_over_budget', '=', True)]"/>
+                <separator/>
+                <filter name="filter_off_plan" string="بيع على الخارطة" domain="[('project_type', '=', 'off_plan')]"/>
+                <filter name="filter_ready" string="وحدات جاهزة" domain="[('project_type', '=', 'ready')]"/>
+                <filter name="filter_contracting" string="مقاولات للغير" domain="[('project_type', '=', 'contracting')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_type" string="نوع المشروع" context="{'group_by': 'project_type'}"/>
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- BOQ Action -->
+    <record id="action_construction_boq" model="ir.actions.act_window">
+        <field name="name">المقايسات وبطاقات المشاريع (BOQ)</field>
+        <field name="res_model">construction.boq</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_construction_boq_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ أول مقايسة وبطاقة مشروع (BOQ)
+            </p>
+            <p>
+                يمكنك تعبئة البنود القياسية الـ 21 والمستندات الرسمية بنقرة واحدة ثم اعتماد المقايسة لإنشاء المشروع والمهام التنفيذية تلقائياً.
+            </p>
+        </field>
+    </record>
+
+    <!-- S1 Menuitems for BOQ (Hub + Native Project Menu) -->
+    <menuitem id="menu_stm_boq"
+              name="المقايسات وبطاقات المشاريع (BOQ)"
+              parent="stm_construction_demo.menu_stm_projects_boq_root"
+              action="action_construction_boq"
+              sequence="10"/>
+
+    <menuitem id="menu_project_stm_boq"
+              name="المقايسات (BOQ)"
+              parent="project.menu_main_pm"
+              action="action_construction_boq"
+              sequence="35"/>
+</odoo>

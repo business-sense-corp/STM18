@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_construction_boq" model="ir.sequence">
+            <field name="name">تسلسل المقايسات (BOQ)</field>
+            <field name="code">construction.boq</field>
+            <field name="prefix">BOQ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_construction_site_request" model="ir.sequence">
+            <field name="name">تسلسل طلبات مواد الموقع</field>
+            <field name="code">construction.site.request</field>
+            <field name="prefix">SRQ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

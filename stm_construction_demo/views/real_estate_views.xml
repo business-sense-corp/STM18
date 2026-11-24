@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Inherit product.template Form View -->
+    <record id="view_product_template_form_stm_real_estate" model="ir.ui.view">
+        <field name="name">product.template.form.stm.real.estate</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="stm_real_estate_readiness" string="التوافر والتسليم العقاري">
+                    <div class="alert alert-info mb-3" role="status">
+                        حالة <strong>جاهزية التسليم</strong> مستقلة تماماً عن حالة <strong>البيع والتوافر</strong> (يمكن بيع وحدة تحت الإنشاء على الخارطة أو إبقاء وحدة جاهزة متاحة للبيع).
+                    </div>
+                    <group>
+                        <group string="حالة الوحدة والتسليم">
+                            <field name="stm_is_real_estate_unit"/>
+                            <field name="stm_unit_availability" widget="badge"
+                                   decoration-success="stm_unit_availability == 'available'"
+                                   decoration-warning="stm_unit_availability == 'reserved'"
+                                   decoration-info="stm_unit_availability == 'sold'"/>
+                            <field name="stm_handover_readiness" widget="badge"
+                                   decoration-warning="stm_handover_readiness == 'under_construction'"
+                                   decoration-info="stm_handover_readiness == 'ready'"
+                                   decoration-success="stm_handover_readiness == 'handed_over'"/>
+                            <field name="stm_expected_handover_date"/>
+                        </group>
+                        <group string="الربط الإنشائي والتكلفة">
+                            <field name="stm_project_id"/>
+                            <field name="stm_unit_cost_id"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 2. Dedicated Real Estate Units Kanban / List / Search Views -->
+    <record id="view_stm_real_estate_unit_kanban" model="ir.ui.view">
+        <field name="name">product.template.stm.unit.kanban</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <kanban string="الوحدات العقارية (التوافر والتسليم)">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="categ_id"/>
+                <field name="stm_unit_availability"/>
+                <field name="stm_handover_readiness"/>
+                <field name="stm_expected_handover_date"/>
+                <field name="stm_project_id"/>
+                <field name="total_cash_price"/>
+                <field name="stm_currency_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <strong class="o_kanban_record_title fs-6">
+                                    <field name="name"/>
+                                </strong>
+                                <field name="stm_unit_availability" widget="badge"
+                                       decoration-success="stm_unit_availability == 'available'"
+                                       decoration-warning="stm_unit_availability == 'reserved'"
+                                       decoration-info="stm_unit_availability == 'sold'"/>
+                            </div>
+                            <div class="text-muted small mb-2">
+                                <span t-if="record.stm_project_id.value"><field name="stm_project_id"/></span>
+                                <span t-elif="record.categ_id.value"><field name="categ_id"/></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                <field name="stm_handover_readiness" widget="badge"
+                                       decoration-warning="stm_handover_readiness == 'under_construction'"
+                                       decoration-info="stm_handover_readiness == 'ready'"
+                                       decoration-success="stm_handover_readiness == 'handed_over'"/>
+                                <span class="fw-bold text-primary" t-if="record.total_cash_price.raw_value">
+                                    <field name="total_cash_price" widget="monetary" options="{'currency_field': 'stm_currency_id'}"/>
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_stm_real_estate_unit_list" model="ir.ui.view">
+        <field name="name">product.template.stm.unit.list</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list string="الوحدات العقارية (التوافر والتسليم)">
+                <field name="name" string="اسم الوحدة"/>
+                <field name="categ_id" string="المشروع / الفئة" optional="show"/>
+                <field name="stm_project_id" optional="show"/>
+                <field name="building_no" optional="show"/>
+                <field name="unit_no" optional="show"/>
+                <field name="unit_area" optional="show"/>
+                <field name="stm_currency_id" column_invisible="True"/>
+                <field name="total_cash_price" string="سعر الكاش" widget="monetary" options="{'currency_field': 'stm_currency_id'}" optional="show"/>
+                <field name="stm_unit_availability" widget="badge"
+                       decoration-success="stm_unit_availability == 'available'"
+                       decoration-warning="stm_unit_availability == 'reserved'"
+                       decoration-info="stm_unit_availability == 'sold'"/>
+                <field name="stm_handover_readiness" widget="badge"
+                       decoration-warning="stm_handover_readiness == 'under_construction'"
+                       decoration-info="stm_handover_readiness == 'ready'"
+                       decoration-success="stm_handover_readiness == 'handed_over'"/>
+                <field name="stm_expected_handover_date" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stm_real_estate_unit_search" model="ir.ui.view">
+        <field name="name">product.template.stm.unit.search</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <search string="بحث الوحدات العقارية">
+                <field name="name"/>
+                <field name="stm_project_id"/>
+                <field name="categ_id"/>
+                <filter name="available" string="متاح للبيع" domain="[('stm_unit_availability', '=', 'available')]"/>
+                <filter name="reserved" string="محجوز" domain="[('stm_unit_availability', '=', 'reserved')]"/>
+                <filter name="sold" string="مباع" domain="[('stm_unit_availability', '=', 'sold')]"/>
+                <separator/>
+                <filter name="ready" string="جاهز للتسليم" domain="[('stm_handover_readiness', '=', 'ready')]"/>
+                <filter name="under_construction" string="تحت الإنشاء" domain="[('stm_handover_readiness', '=', 'under_construction')]"/>
+                <filter name="handed_over" string="تم التسليم" domain="[('stm_handover_readiness', '=', 'handed_over')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_avail" string="حالة البيع" context="{'group_by': 'stm_unit_availability'}"/>
+                    <filter name="group_handover" string="جاهزية التسليم" context="{'group_by': 'stm_handover_readiness'}"/>
+                    <filter name="group_project" string="المشروع الإنشائي" context="{'group_by': 'stm_project_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_stm_real_estate_units" model="ir.actions.act_window">
+        <field name="name">الوحدات العقارية (التوافر والتسليم)</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('stm_is_real_estate_unit', '=', True)]</field>
+        <field name="context">{'default_stm_is_real_estate_unit': True}</field>
+        <field name="search_view_id" ref="view_stm_real_estate_unit_search"/>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_stm_real_estate_unit_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_stm_real_estate_unit_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('product.product_template_form_view')}),
+        ]"/>
+    </record>
+
+    <menuitem id="menu_stm_real_estate_units"
+              name="الوحدات العقارية (التوافر والتسليم)"
+              parent="stm_construction_demo.menu_stm_real_estate_root"
+              action="action_stm_real_estate_units"
+              sequence="20"/>
+
+    <!-- 3. Inherit real.estate.contract Form & List Views (zero modification to existing fields) -->
+    <record id="view_real_estate_contract_form_stm_inherit" model="ir.ui.view">
+        <field name="name">real.estate.contract.form.stm.inherit</field>
+        <field name="model">real.estate.contract</field>
+        <field name="inherit_id" ref="real_estate_contract.view_real_estate_contract_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='state']" position="before">
+                <button name="action_stm_handover_ready"
+                        type="object"
+                        string="تجهيز للتسليم"
+                        class="btn-secondary"
+                        invisible="stm_handover_status != 'pending'"/>
+                <button name="action_stm_handover_approve"
+                        type="object"
+                        string="اعتماد التسليم (مدير المشروع)"
+                        class="btn-primary"
+                        groups="stm_construction_demo.group_stm_project_manager"
+                        invisible="stm_handover_status != 'ready'"/>
+                <button name="action_stm_handover_deliver"
+                        type="object"
+                        string="تسليم فعلي للعميل"
+                        class="btn-success"
+                        invisible="stm_handover_status != 'approved'"/>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <group string="جاهزية التسليم وربط تكلفة الإنشاء بالربحية (STM)">
+                    <group string="مسار تسليم الوحدة">
+                        <field name="stm_handover_status" widget="badge"
+                               decoration-muted="stm_handover_status == 'pending'"
+                               decoration-info="stm_handover_status == 'ready'"
+                               decoration-warning="stm_handover_status == 'approved'"
+                               decoration-success="stm_handover_status == 'delivered'"/>
+                        <field name="stm_expected_handover_date"/>
+                        <field name="stm_actual_handover_date"/>
+                        <field name="stm_handover_approved_by"/>
+                    </group>
+                    <group string="ربط تكلفة البناء بالربحية">
+                        <field name="stm_project_id"/>
+                        <field name="stm_unit_cost_id"/>
+                        <field name="stm_unit_cost_currency_id" invisible="1"/>
+                        <field name="stm_expected_unit_cost" widget="monetary" options="{'currency_field': 'stm_unit_cost_currency_id'}"/>
+                        <field name="stm_expected_unit_margin" widget="monetary" options="{'currency_field': 'stm_unit_cost_currency_id'}" class="text-success fw-bold"/>
+                        <field name="stm_expected_unit_margin_pct" class="text-success fw-bold"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_real_estate_contract_list_stm_inherit" model="ir.ui.view">
+        <field name="name">real.estate.contract.list.stm.inherit</field>
+        <field name="model">real.estate.contract</field>
+        <field name="inherit_id" ref="real_estate_contract.view_real_estate_contract_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="stm_handover_status" optional="show" widget="badge"
+                       decoration-muted="stm_handover_status == 'pending'"
+                       decoration-info="stm_handover_status == 'ready'"
+                       decoration-warning="stm_handover_status == 'approved'"
+                       decoration-success="stm_handover_status == 'delivered'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 4. Inherit project.project Form View (Project 360 Real Estate Bridge) -->
+    <record id="view_project_form_stm_real_estate_bridge" model="ir.ui.view">
+        <field name="name">project.project.form.stm.real.estate.bridge</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_stm_units"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-home">
+                    <field name="stm_unit_count" widget="statinfo" string="الوحدات العقارية"/>
+                </button>
+                <button name="action_view_stm_unit_costs"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-line-chart">
+                    <field name="stm_unit_cost_count" widget="statinfo" string="ربحية البلوك والوحدة"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

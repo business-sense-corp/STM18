@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Online Booking List View -->
+    <record id="view_construction_online_booking_list" model="ir.ui.view">
+        <field name="name">construction.online.booking.list</field>
+        <field name="model">construction.online.booking</field>
+        <field name="arch" type="xml">
+            <list string="الحجوزات الإلكترونية (محاكاة)"
+                  decoration-info="state == 'incoming'"
+                  decoration-warning="state == 'under_review'"
+                  decoration-success="state == 'approved'"
+                  decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="booking_date"/>
+                <field name="source_channel" widget="badge"/>
+                <field name="partner_id"/>
+                <field name="customer_phone" optional="show"/>
+                <field name="product_id"/>
+                <field name="project_categ_id" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="deposit_amount" widget="monetary" options="{'currency_field': 'currency_id'}" sum="إجمالي العربون"/>
+                <field name="sync_status" widget="badge"
+                       decoration-info="sync_status == 'synced_sim'"
+                       decoration-warning="sync_status == 'pending'"/>
+                <field name="sale_order_id" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'incoming'"
+                       decoration-warning="state == 'under_review'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Online Booking Form View -->
+    <record id="view_construction_online_booking_form" model="ir.ui.view">
+        <field name="name">construction.online.booking.form</field>
+        <field name="model">construction.online.booking</field>
+        <field name="arch" type="xml">
+            <form string="حجز إلكتروني وارد (محاكاة)">
+                <header>
+                    <button name="action_start_review"
+                            type="object"
+                            string="بدء المراجعة"
+                            class="btn-secondary"
+                            invisible="state != 'incoming'"/>
+                    <button name="action_approve_create_sale"
+                            type="object"
+                            string="اعتماد وإنشاء أمر بيع"
+                            class="btn-primary"
+                            icon="fa-check-circle"
+                            invisible="state not in ('incoming', 'under_review')"/>
+                    <button name="action_reject"
+                            type="object"
+                            string="رفض الحجز"
+                            class="btn-danger"
+                            invisible="state not in ('incoming', 'under_review')"/>
+                    <button name="action_reset_incoming"
+                            type="object"
+                            string="إعادة لوارد"
+                            invisible="state != 'rejected'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="incoming,under_review,approved"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="محاكاة — موقع إلكتروني" bg_color="text-bg-info"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-cart"
+                                invisible="not sale_order_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">أمر البيع</span>
+                                <span class="o_stat_text">المرتبط</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="بيانات العميل والوحدة">
+                            <field name="partner_id" readonly="state in ('approved', 'rejected')"/>
+                            <field name="customer_phone" readonly="state in ('approved', 'rejected')" style="direction: ltr; text-align: right;"/>
+                            <field name="product_id" readonly="state in ('approved', 'rejected')"/>
+                            <field name="project_categ_id"/>
+                            <field name="sale_order_id" readonly="1" invisible="not sale_order_id"/>
+                        </group>
+                        <group string="تفاصيل الحجز والربط (محاكاة)">
+                            <field name="source_channel" readonly="state in ('approved', 'rejected')"/>
+                            <field name="booking_date" readonly="state in ('approved', 'rejected')"/>
+                            <field name="currency_id" readonly="state in ('approved', 'rejected')"/>
+                            <field name="deposit_amount" widget="monetary" options="{'currency_field': 'currency_id'}"
+                                   readonly="state in ('approved', 'rejected')"/>
+                            <field name="sync_status" widget="badge"
+                                   decoration-info="sync_status == 'synced_sim'"
+                                   decoration-warning="sync_status == 'pending'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="سبب الرفض" invisible="state == 'approved'">
+                        <field name="rejection_reason" nolabel="1" colspan="2"
+                               placeholder="يُكتب سبب الرفض هنا قبل الضغط على زر رفض الحجز..."/>
+                    </group>
+                    <notebook>
+                        <page name="sync_log_page" string="سجل المزامنة مع الموقع (محاكاة)">
+                            <field name="sync_log" readonly="1"/>
+                        </page>
+                        <page name="notes_page" string="ملاحظات">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Online Booking Search View -->
+    <record id="view_construction_online_booking_search" model="ir.ui.view">
+        <field name="name">construction.online.booking.search</field>
+        <field name="model">construction.online.booking</field>
+        <field name="arch" type="xml">
+            <search string="بحث الحجوزات الإلكترونية">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <filter name="incoming" string="وارد من الموقع" domain="[('state', '=', 'incoming')]"/>
+                <filter name="under_review" string="قيد المراجعة" domain="[('state', '=', 'under_review')]"/>
+                <filter name="approved" string="معتمد" domain="[('state', '=', 'approved')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_channel" string="قناة الحجز" context="{'group_by': 'source_channel'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_construction_online_booking" model="ir.actions.act_window">
+        <field name="name">الحجوزات الإلكترونية (محاكاة)</field>
+        <field name="res_model">construction.online.booking</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_construction_online_booking_search"/>
+    </record>
+
+    <!-- Triple Menuitems: Executive Hub + Native Sales + Real Estate Contracts -->
+    <menuitem id="menu_stm_online_booking"
+              name="الحجوزات الإلكترونية (محاكاة)"
+              parent="stm_construction_demo.menu_stm_real_estate_root"
+              action="action_construction_online_booking"
+              sequence="10"/>
+
+    <menuitem id="menu_sale_stm_online_booking"
+              name="الحجوزات الإلكترونية (محاكاة)"
+              parent="sale.sale_order_menu"
+              action="action_construction_online_booking"
+              sequence="45"/>
+
+    <menuitem id="menu_contract_stm_online_booking"
+              name="الحجوزات الإلكترونية (محاكاة)"
+              parent="real_estate_contract.menu_real_estate_contract_root"
+              action="action_construction_online_booking"
+              sequence="20"/>
+</odoo>

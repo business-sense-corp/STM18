@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demo Loader & Rehearsal Reset Form View -->
+    <record id="view_stm_demo_loader_form" model="ir.ui.view">
+        <field name="name">stm.demo.loader.form</field>
+        <field name="model">stm.demo.loader</field>
+        <field name="arch" type="xml">
+            <form string="إدارة بيانات الديمو وتجهيز البروفة">
+                <header>
+                    <button name="action_load_demo_data"
+                            type="object"
+                            string="إعادة تحميل بيانات الديمو (آمن بدون تكرار)"
+                            class="btn-primary"
+                            icon="fa-refresh"/>
+                    <button name="action_reset_rehearsal_triggers"
+                            type="object"
+                            string="تجهيز مسرح العرض للبروفة"
+                            class="btn-warning"
+                            icon="fa-magic"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="أداة تجهيز الديمو" bg_color="text-bg-primary"/>
+                    <div class="oe_title">
+                        <h1>مركز تحميل بيانات الديمو وتجهيز مسرح العرض</h1>
+                    </div>
+
+                    <div class="alert alert-info mb-3" role="status">
+                        <p class="mb-2">
+                            <strong>تأكيد سلامة البيانات:</strong>
+                            عملية التحميل وإعادة التجهيز متكررة بأمان (Idempotent) وتعمل بعملة <strong>SAR</strong> للمشاريع الجديدة فقط،
+                            مع الحفاظ التام على عقود <strong>NEW CAIRO / LA VISTA</strong> بعملة <strong>EGP</strong> وسجلات <strong>sh_pdc</strong> دون أي تعديل.
+                        </p>
+                        <p class="mb-0 text-muted small">
+                            <i class="fa fa-info-circle me-1"/>
+                            تنبيه: حسابات المستخدمين الثلاثة أدناه <strong>مخصصة لاستعراض مسارات الاعتماد والرفض في الديمو (ليست مصفوفة صلاحيات إنتاجية)</strong>.
+                        </p>
+                    </div>
+
+                    <group string="مستخدمو العرض التجريبي الثلاثة (كلمة المرور: 1 | اللغة: العربية)">
+                        <div colspan="2">
+                            <table class="table table-sm table-bordered mb-3">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>الدور</th>
+                                        <th>اسم الدخول</th>
+                                        <th>كلمة المرور</th>
+                                        <th>المسؤولية في العرض</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>مهندس الموقع</strong></td>
+                                        <td><code>site_engineer</code></td>
+                                        <td><code>1</code></td>
+                                        <td>رفع طلبات مواد الموقع، تسجيل نسب الإنجاز والحصر والمعدات، إنشاء مسودة المستخلص.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>مدير المشروع والعمليات</strong></td>
+                                        <td><code>project_manager</code></td>
+                                        <td><code>1</code></td>
+                                        <td>اعتماد/رفض طلبات المواد والمستخلصات، اعتماد الحجز الإلكتروني والتسليم، استعراض لوحة الإدارة والمساعد الذكي.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>المبيعات والمالية</strong></td>
+                                        <td><code>sales_finance</code></td>
+                                        <td><code>1</code></td>
+                                        <td>مراجعة المستخلصات بالمحاسبة وإنشاء مسودة فاتورة مورد/عميل، إدارة عقود العقارات وشيكات PDC.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </group>
+
+                    <group string="حالة ونتيجة آخر عملية">
+                        <field name="last_result_html" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action: Open Demo Loader -->
+    <record id="action_stm_demo_loader" model="ir.actions.act_window">
+        <field name="name">إعادة تحميل بيانات الديمو</field>
+        <field name="res_model">stm.demo.loader</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Server Action: One-Click Rehearsal Reset -->
+    <record id="action_stm_reset_rehearsal_server" model="ir.actions.server">
+        <field name="name">تجهيز مسرح العرض للبروفة</field>
+        <field name="model_id" ref="model_stm_demo_loader"/>
+        <field name="state">code</field>
+        <field name="code">action = env['stm.demo.loader'].create({}).action_reset_rehearsal_triggers()</field>
+    </record>
+
+    <!-- === S4 Menuitems under الإعدادات والديمو === -->
+    <menuitem id="menu_stm_demo_loader"
+              name="إعادة تحميل بيانات الديمو"
+              parent="stm_construction_demo.menu_stm_settings_root"
+              action="action_stm_demo_loader"
+              sequence="20"/>
+
+    <menuitem id="menu_stm_demo_rehearsal_reset"
+              name="تجهيز مسرح العرض للبروفة"
+              parent="stm_construction_demo.menu_stm_settings_root"
+              action="action_stm_reset_rehearsal_server"
+              sequence="30"/>
+</odoo>
