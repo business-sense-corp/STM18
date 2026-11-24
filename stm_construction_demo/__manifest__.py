@@ -32,6 +32,11 @@
         'security/ir.model.access.csv',
         'views/menus.xml',
         # === S1 ===
+        'data/boq_sequence.xml',
+        'views/boq_views.xml',
+        'views/project_views.xml',
+        'views/site_request_views.xml',
+        'report/boq_report.xml',
         # === S2 ===
         # === S3 ===
         # === S4 ===
