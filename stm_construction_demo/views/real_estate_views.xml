@@ -48,7 +48,7 @@
                 <field name="stm_expected_handover_date"/>
                 <field name="stm_project_id"/>
                 <field name="total_cash_price"/>
-                <field name="currency_id"/>
+                <field name="stm_currency_id"/>
                 <templates>
                     <t t-name="card">
                         <div class="oe_kanban_global_click p-2">
@@ -62,8 +62,8 @@
                                        decoration-info="stm_unit_availability == 'sold'"/>
                             </div>
                             <div class="text-muted small mb-2">
-                                <span t-if="record.categ_id.value"><field name="categ_id"/></span>
-                                <span t-if="record.stm_project_id.value"> • <field name="stm_project_id"/></span>
+                                <span t-if="record.stm_project_id.value"><field name="stm_project_id"/></span>
+                                <span t-elif="record.categ_id.value"><field name="categ_id"/></span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                 <field name="stm_handover_readiness" widget="badge"
@@ -71,7 +71,7 @@
                                        decoration-info="stm_handover_readiness == 'ready'"
                                        decoration-success="stm_handover_readiness == 'handed_over'"/>
                                 <span class="fw-bold text-primary" t-if="record.total_cash_price.raw_value">
-                                    <field name="total_cash_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="total_cash_price" widget="monetary" options="{'currency_field': 'stm_currency_id'}"/>
                                 </span>
                             </div>
                         </div>
@@ -92,8 +92,8 @@
                 <field name="building_no" optional="show"/>
                 <field name="unit_no" optional="show"/>
                 <field name="unit_area" optional="show"/>
-                <field name="currency_id" column_invisible="True"/>
-                <field name="total_cash_price" string="سعر الكاش" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show"/>
+                <field name="stm_currency_id" column_invisible="True"/>
+                <field name="total_cash_price" string="سعر الكاش" widget="monetary" options="{'currency_field': 'stm_currency_id'}" optional="show"/>
                 <field name="stm_unit_availability" widget="badge"
                        decoration-success="stm_unit_availability == 'available'"
                        decoration-warning="stm_unit_availability == 'reserved'"

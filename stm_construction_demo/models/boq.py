@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from markupsafe import Markup
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -528,10 +529,10 @@ class ConstructionBoq(models.Model):
                 rec.state = 'confirmed'
 
             rec.message_post(
-                body=(
-                    f"تم اعتماد المقايسة وربطها بالمشروع <b>{project.name}</b> "
-                    f"(إنشاء {created_tasks} مهمة رئيسية و {created_subtasks} مهمة فرعية)."
-                )
+                body=Markup(
+                    "تم اعتماد المقايسة وربطها بالمشروع <b>%s</b> "
+                    "(إنشاء %s مهمة رئيسية و %s مهمة فرعية)."
+                ) % (project.name, created_tasks, created_subtasks)
             )
         return True
 

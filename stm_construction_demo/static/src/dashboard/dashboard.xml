@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
     <t t-name="stm_construction_demo.ConstructionDashboard">
         <div class="o_stm_dashboard" dir="rtl">
-            <!-- Top Architectural Command Bar -->
+            <!-- Top Light Architectural Command Bar -->
             <header class="stm-cmd-bar">
                 <div class="stm-cmd-brand">
                     <div class="stm-cmd-emblem">
@@ -20,10 +20,9 @@
                     <div class="stm-legend-pills">
                         <span class="stm-pill-live">
                             <span class="stm-dot-live"/>
-                            بيانات حية من النظام
+                            بيانات حية
                         </span>
                         <span class="stm-pill-sim">
-                            <i class="fa fa-flask" aria-hidden="true"/>
                             محاكاة استعراضية
                         </span>
                     </div>
@@ -47,7 +46,7 @@
                     <button type="button" class="stm-btn-ai" t-on-click="toggleAiPanel">
                         <i class="fa fa-magic" aria-hidden="true"/>
                         <span>المساعد الذكي</span>
-                        <span class="stm-mini-sim">محاكاة</span>
+                        <span class="stm-btn-ai-tag">محاكاة</span>
                     </button>
                 </div>
             </header>
@@ -60,11 +59,11 @@
             </t>
 
             <t t-if="state.data">
-                <!-- Group 5: Live Executive Alert Strip -->
+                <!-- Group 5: Restrained Executive Alert Ticker -->
                 <section class="stm-alert-strip" t-if="state.data.alerts.length">
                     <div class="stm-alert-label">
-                        <i class="fa fa-bell" aria-hidden="true"/>
-                        <span>التنبيهات التنفيذية:</span>
+                        <i class="fa fa-bell-o" aria-hidden="true"/>
+                        <span>التنبيهات:</span>
                     </div>
                     <div class="stm-alert-pills">
                         <t t-foreach="state.data.alerts" t-as="al" t-key="al.key">
@@ -72,10 +71,11 @@
                                     class="stm-alert-pill"
                                     t-att-class="'is-' + al.severity"
                                     t-on-click="() => this.onAlertClick(al)">
+                                <span class="stm-alert-dot"/>
                                 <span class="stm-alert-pill-title"><t t-out="al.title"/></span>
                                 <span class="stm-alert-pill-sep">•</span>
                                 <span class="stm-alert-pill-detail"><t t-out="al.detail"/></span>
-                                <i class="fa fa-arrow-left stm-alert-arrow" aria-hidden="true"/>
+                                <i class="fa fa-angle-left stm-alert-arrow" aria-hidden="true"/>
                             </button>
                         </t>
                     </div>
@@ -85,18 +85,21 @@
                 <main class="stm-workspace" t-att-class="{'is-ai-closed': !state.aiOpen}">
                     <!-- Primary Command Canvas -->
                     <div class="stm-canvas">
-                        <!-- Row 1: 4 Clickable Executive KPI Cards -->
+                        <!-- Row 1: 4 Uniform Executive KPI Cards -->
                         <section class="stm-kpi-grid">
                             <!-- Card 1: Projects & Progress -->
                             <div class="stm-kpi-card is-clickable"
                                  t-on-click="() => this.openAction('project.open_view_project_all')">
                                 <div class="stm-kpi-top">
                                     <span class="stm-kpi-label">المشروعات ونسب الإنجاز</span>
-                                    <span class="stm-kpi-icon is-navy"><i class="fa fa-tasks" aria-hidden="true"/></span>
+                                    <span class="stm-kpi-icon"><i class="fa fa-tasks" aria-hidden="true"/></span>
                                 </div>
                                 <div class="stm-kpi-value stm-num">
                                     <t t-out="state.data.projects.total_count"/>
-                                    <span class="stm-kpi-unit">مشروع</span>
+                                    <span class="stm-kpi-unit">مشاريع</span>
+                                    <span t-if="state.data.projects.draft_boq_count > 0" class="stm-kpi-draft-note">
+                                        (+<t t-out="state.data.projects.draft_boq_count"/> مسودة)
+                                    </span>
                                 </div>
                                 <div class="stm-kpi-bar-wrap">
                                     <div class="stm-kpi-bar-meta">
@@ -104,13 +107,13 @@
                                         <span>المخطط <strong class="stm-num"><t t-out="state.data.projects.avg_progress_planned"/>%</strong></span>
                                     </div>
                                     <div class="stm-progress-track">
-                                        <div class="stm-progress-fill is-emerald"
+                                        <div class="stm-progress-fill"
                                              t-attf-style="width: {{Math.min(100, state.data.projects.avg_progress_actual)}}%"/>
                                     </div>
                                 </div>
                                 <div class="stm-kpi-foot">
                                     <span t-if="state.data.projects.delayed_count > 0" class="stm-tag-danger">
-                                        <i class="fa fa-clock-o" aria-hidden="true"/>
+                                        <span class="stm-sig-dot is-danger"/>
                                         <t t-out="state.data.projects.delayed_count"/> متأخر عن الجدول
                                     </span>
                                     <span t-else="" class="stm-tag-ok">منتظم حسب الخطة</span>
@@ -123,7 +126,7 @@
                                  t-on-click="() => this.openModelList('construction.boq', 'المقايسات وبطاقات المشاريع (BOQ)')">
                                 <div class="stm-kpi-top">
                                     <span class="stm-kpi-label">الموازنة مقابل التكلفة المتوقعة (EAC)</span>
-                                    <span class="stm-kpi-icon is-crimson"><i class="fa fa-calculator" aria-hidden="true"/></span>
+                                    <span class="stm-kpi-icon"><i class="fa fa-calculator" aria-hidden="true"/></span>
                                 </div>
                                 <div class="stm-kpi-value stm-num">
                                     <t t-out="this.fmtNum(state.data.costs.total_eac)"/>
@@ -135,7 +138,7 @@
                                 </div>
                                 <div class="stm-kpi-foot">
                                     <span t-if="state.data.costs.early_warning_projects.length" class="stm-tag-danger">
-                                        <i class="fa fa-exclamation-triangle" aria-hidden="true"/>
+                                        <span class="stm-sig-dot is-danger"/>
                                         <t t-out="state.data.costs.early_warning_projects.length"/> إنذار مبكر (70%/90%)
                                     </span>
                                     <span t-else="" class="stm-tag-neutral">
@@ -150,21 +153,21 @@
                                  t-on-click="() => this.openAction('stm_construction_demo.action_stm_real_estate_units')">
                                 <div class="stm-kpi-top">
                                     <span class="stm-kpi-label">الوحدات العقارية والحجز</span>
-                                    <span class="stm-kpi-icon is-emerald"><i class="fa fa-home" aria-hidden="true"/></span>
+                                    <span class="stm-kpi-icon"><i class="fa fa-home" aria-hidden="true"/></span>
                                 </div>
                                 <div class="stm-kpi-value stm-num">
                                     <t t-out="state.data.real_estate.availability.total_units"/>
                                     <span class="stm-kpi-unit">وحدة</span>
                                 </div>
                                 <div class="stm-kpi-subrow">
-                                    <span class="text-success">متاح: <strong class="stm-num"><t t-out="state.data.real_estate.availability.available"/></strong></span>
-                                    <span class="text-warning">محجوز: <strong class="stm-num"><t t-out="state.data.real_estate.availability.reserved"/></strong></span>
-                                    <span class="text-primary">مباع: <strong class="stm-num"><t t-out="state.data.real_estate.availability.sold"/></strong></span>
+                                    <span><i class="stm-dot-xs is-accent"/> متاح: <strong class="stm-num"><t t-out="state.data.real_estate.availability.available"/></strong></span>
+                                    <span><i class="stm-dot-xs is-slate"/> محجوز: <strong class="stm-num"><t t-out="state.data.real_estate.availability.reserved"/></strong></span>
+                                    <span><i class="stm-dot-xs is-ink"/> مباع: <strong class="stm-num"><t t-out="state.data.real_estate.availability.sold"/></strong></span>
                                 </div>
                                 <div class="stm-kpi-foot">
                                     <span class="stm-tag-sim"
                                           t-on-click.stop="() => this.openAction('stm_construction_demo.action_construction_online_booking')">
-                                        حجز إلكتروني وارد: <strong class="stm-num"><t t-out="state.data.real_estate.incoming_bookings"/></strong> (محاكاة)
+                                        حجز وارد: <strong class="stm-num"><t t-out="state.data.real_estate.incoming_bookings"/></strong> (محاكاة)
                                     </span>
                                     <span class="stm-drill-hint">عرض الوحدات</span>
                                 </div>
@@ -175,7 +178,7 @@
                                  t-on-click="() => this.openModelList('construction.certificate', 'المستخلصات', [['certificate_type', '=', 'vendor']])">
                                 <div class="stm-kpi-top">
                                     <span class="stm-kpi-label">المستخلصات والسيولة (60 يوم)</span>
-                                    <span class="stm-kpi-icon is-brass"><i class="fa fa-money" aria-hidden="true"/></span>
+                                    <span class="stm-kpi-icon"><i class="fa fa-file-text-o" aria-hidden="true"/></span>
                                 </div>
                                 <div class="stm-kpi-value stm-num">
                                     <t t-out="this.fmtNum(state.data.finance.certificates.vendor_total_net)"/>
@@ -187,6 +190,7 @@
                                 </div>
                                 <div class="stm-kpi-foot">
                                     <span t-if="state.data.finance.liquidity_sim.cash_deficit_amount > 0" class="stm-tag-warn">
+                                        <span class="stm-sig-dot is-warn"/>
                                         عجز سيولة: <span class="stm-num"><t t-out="this.fmtNum(state.data.finance.liquidity_sim.cash_deficit_amount)"/></span>
                                     </span>
                                     <span t-else="" class="stm-tag-ok">تغطية نقدية متوازنة</span>
@@ -195,7 +199,7 @@
                             </div>
                         </section>
 
-                        <!-- Row 2 (Signature Centerpiece): 10-Unit Block Cost-to-Sale Margin Card -->
+                        <!-- Row 2 (Signature Focal Element): 10-Unit Block Architectural Economics Ledger -->
                         <section class="stm-block-hero" t-if="state.data.finance.unit_cost">
                             <t t-set="uc" t-value="state.data.finance.unit_cost"/>
                             <div class="stm-block-header">
@@ -203,7 +207,7 @@
                                     <div class="stm-eyebrow">ربط تكلفة الإنشاء بسعر البيع والهامش المتوقع</div>
                                     <h2 class="stm-block-title">
                                         <t t-out="uc.name"/>
-                                        <span class="stm-block-proj">— <t t-out="uc.project_name"/></span>
+                                        <span class="stm-block-proj"> — <t t-out="uc.project_name"/></span>
                                     </h2>
                                 </div>
                                 <button type="button" class="stm-btn-edit"
@@ -214,7 +218,7 @@
                             </div>
 
                             <div class="stm-block-grid">
-                                <!-- Left/Start: Block Cost Equation -->
+                                <!-- Cost Progression Ledger -->
                                 <div class="stm-block-col">
                                     <div class="stm-col-heading">
                                         <span>1. اقتصاديات البلوك (<span class="stm-num"><t t-out="uc.units_count"/></span> وحدات)</span>
@@ -246,12 +250,12 @@
                                     </div>
                                 </div>
 
-                                <!-- Right/End: Per-Unit Margin Seal -->
+                                <!-- Obsidian Charcoal Per-Unit Margin Panel -->
                                 <div class="stm-unit-seal">
                                     <div class="stm-seal-top">
                                         <div>
                                             <div class="stm-seal-lbl">الهامش المتوقع للوحدة</div>
-                                            <div class="stm-seal-formula stm-num">
+                                            <div class="stm-seal-formula stm-num" dir="ltr">
                                                 <t t-out="this.fmtNum(uc.unit_net_sale_price)"/> − <t t-out="this.fmtNum(uc.unit_expected_cost)"/>
                                             </div>
                                         </div>
@@ -268,7 +272,7 @@
                                 </div>
                             </div>
 
-                            <!-- Accounting Separation Strip -->
+                            <!-- Calm Accounting Separation Strip -->
                             <div class="stm-cash-separation">
                                 <div class="stm-cash-metrics">
                                     <span class="stm-cash-chip">
@@ -289,12 +293,12 @@
 
                         <!-- Row 3: Two Offline Inline SVG Charts -->
                         <section class="stm-charts-grid">
-                            <!-- Chart 1: Budget vs Actual vs EAC Horizontal SVG Bars + 70%/90% Gauge -->
+                            <!-- Chart 1: RTL Budget vs Actual vs EAC Horizontal SVG Bars -->
                             <div class="stm-panel-card">
                                 <div class="stm-panel-head">
                                     <div>
                                         <h3>مقارنة المخطط مقابل الفعلي والتكلفة المتوقعة (EAC)</h3>
-                                        <p class="stm-panel-sub">مراقبة حرق الميزانية ونسبة الإنجاز لاكتشاف التجاوزات مبكراً</p>
+                                        <p class="stm-panel-sub">مراقبة استهلاك الميزانية ونسبة الإنجاز لاكتشاف التجاوزات مبكراً</p>
                                     </div>
                                     <div class="stm-chart-legend">
                                         <span><i class="stm-swatch is-planned"/>مخطط</span>
@@ -305,6 +309,9 @@
 
                                 <div class="stm-svg-bar-list">
                                     <t t-foreach="state.data.costs.project_chart_series" t-as="row" t-key="row.res_id + '_' + row.name">
+                                        <t t-set="w_plan" t-value="this.barPct(row.planned) * 4"/>
+                                        <t t-set="w_act" t-value="this.barPct(row.actual) * 4"/>
+                                        <t t-set="w_eac" t-value="this.barPct(row.eac) * 4"/>
                                         <div class="stm-bar-item is-clickable"
                                              t-on-click="() => this.openRecord(row.res_model, row.res_id)">
                                             <div class="stm-bar-meta">
@@ -318,18 +325,19 @@
                                                     إنجاز <t t-out="row.progress"/>% • صرف <t t-out="row.cost_burn"/>%
                                                 </span>
                                             </div>
-                                            <svg class="stm-svg-bars" viewBox="0 0 400 34" preserveAspectRatio="none" role="img" t-att-aria-label="row.name">
+                                            <!-- RTL Bars growing from right edge (x=400) leftward -->
+                                            <svg class="stm-svg-bars" viewBox="0 0 400 32" preserveAspectRatio="none" role="img" t-att-aria-label="row.name">
                                                 <!-- Planned -->
-                                                <rect x="0" y="2" width="400" height="8" rx="4" fill="#EEF2F7"/>
-                                                <rect x="0" y="2" t-att-width="this.barPct(row.planned) * 4" height="8" rx="4" fill="#94A3B8"/>
+                                                <rect x="0" y="2" width="400" height="7" rx="3.5" fill="#ECEFF4"/>
+                                                <rect t-att-x="400 - w_plan" y="2" t-att-width="w_plan" height="7" rx="3.5" fill="#CBD5E1"/>
                                                 <!-- Actual -->
-                                                <rect x="0" y="13" width="400" height="8" rx="4" fill="#EEF2F7"/>
-                                                <rect x="0" y="13" t-att-width="this.barPct(row.actual) * 4" height="8" rx="4"
-                                                      t-att-fill="row.is_alert ? '#C0392B' : '#0F223D'"/>
+                                                <rect x="0" y="12.5" width="400" height="7" rx="3.5" fill="#ECEFF4"/>
+                                                <rect t-att-x="400 - w_act" y="12.5" t-att-width="w_act" height="7" rx="3.5"
+                                                      t-att-fill="row.is_alert ? '#B42318' : '#0F4C5C'"/>
                                                 <!-- EAC -->
-                                                <rect x="0" y="24" width="400" height="8" rx="4" fill="#EEF2F7"/>
-                                                <rect x="0" y="24" t-att-width="this.barPct(row.eac) * 4" height="8" rx="4"
-                                                      t-att-fill="row.eac > row.planned ? '#B88122' : '#0D7A5F'"/>
+                                                <rect x="0" y="23" width="400" height="7" rx="3.5" fill="#ECEFF4"/>
+                                                <rect t-att-x="400 - w_eac" y="23" t-att-width="w_eac" height="7" rx="3.5"
+                                                      t-att-fill="row.eac > row.planned ? '#B45309' : '#64748B'"/>
                                             </svg>
                                             <div class="stm-bar-vals stm-num">
                                                 <span>مخطط: <t t-out="this.fmtNum(row.planned)"/></span>
@@ -341,8 +349,8 @@
                                 </div>
                             </div>
 
-                            <!-- Chart 2: Real Estate Unit Status SVG Donut + Independent Handover Matrix -->
-                            <div class="stm-panel-card">
+                            <!-- Chart 2: Real Estate Unit Status SVG Donut + Balanced Handover Matrix -->
+                            <div class="stm-panel-card stm-unit-card">
                                 <div class="stm-panel-head">
                                     <div>
                                         <h3>توزيع الوحدات وجاهزية التسليم المستقلة</h3>
@@ -359,15 +367,15 @@
                                     <svg class="stm-donut-svg" viewBox="0 0 140 140" role="img" aria-label="توزيع الوحدات العقارية">
                                         <circle cx="70" cy="70" r="52" fill="none" stroke="#EAEFF5" stroke-width="18"/>
                                         <t t-if="seg.total > 0">
-                                            <circle cx="70" cy="70" r="52" fill="none" stroke="#0D7A5F" stroke-width="18"
+                                            <circle cx="70" cy="70" r="52" fill="none" stroke="#0F4C5C" stroke-width="18"
                                                     t-attf-stroke-dasharray="{{seg.availLen}} {{seg.circumference}}"
                                                     stroke-dashoffset="0"
                                                     transform="rotate(-90 70 70)"/>
-                                            <circle cx="70" cy="70" r="52" fill="none" stroke="#B88122" stroke-width="18"
+                                            <circle cx="70" cy="70" r="52" fill="none" stroke="#94A3B8" stroke-width="18"
                                                     t-attf-stroke-dasharray="{{seg.reservedLen}} {{seg.circumference}}"
                                                     t-att-stroke-dashoffset="seg.reservedOffset"
                                                     transform="rotate(-90 70 70)"/>
-                                            <circle cx="70" cy="70" r="52" fill="none" stroke="#0F223D" stroke-width="18"
+                                            <circle cx="70" cy="70" r="52" fill="none" stroke="#0F172A" stroke-width="18"
                                                     t-attf-stroke-dasharray="{{seg.soldLen}} {{seg.circumference}}"
                                                     t-att-stroke-dashoffset="seg.soldOffset"
                                                     transform="rotate(-90 70 70)"/>
@@ -379,23 +387,37 @@
                                     <div class="stm-donut-stats">
                                         <div class="stm-stat-group-title">حالة البيع والتوافر</div>
                                         <div class="stm-stat-row">
-                                            <span><i class="stm-dot is-emerald"/>متاح للبيع</span>
+                                            <span><i class="stm-dot is-accent"/>متاح للبيع</span>
                                             <strong class="stm-num"><t t-out="state.data.real_estate.availability.available"/></strong>
                                         </div>
                                         <div class="stm-stat-row">
-                                            <span><i class="stm-dot is-brass"/>محجوز</span>
+                                            <span><i class="stm-dot is-slate"/>محجوز</span>
                                             <strong class="stm-num"><t t-out="state.data.real_estate.availability.reserved"/></strong>
                                         </div>
                                         <div class="stm-stat-row">
-                                            <span><i class="stm-dot is-navy"/>مباع</span>
+                                            <span><i class="stm-dot is-ink"/>مباع</span>
                                             <strong class="stm-num"><t t-out="state.data.real_estate.availability.sold"/></strong>
                                         </div>
+                                    </div>
+                                </div>
 
-                                        <div class="stm-stat-group-title mt-2">جاهزية التسليم (مستقلة)</div>
-                                        <div class="stm-readiness-chips">
-                                            <span class="stm-r-chip is-warn">تحت الإنشاء: <strong class="stm-num"><t t-out="state.data.real_estate.readiness.under_construction"/></strong></span>
-                                            <span class="stm-r-chip is-info">جاهز للتسليم: <strong class="stm-num"><t t-out="state.data.real_estate.readiness.ready"/></strong></span>
-                                            <span class="stm-r-chip is-ok">تم التسليم: <strong class="stm-num"><t t-out="state.data.real_estate.readiness.handed_over"/></strong></span>
+                                <div class="stm-readiness-panel">
+                                    <div class="stm-stat-group-title">جاهزية التسليم الإنشائية (مستقلة عن البيع)</div>
+                                    <div class="stm-readiness-grid">
+                                        <div class="stm-r-tile is-clickable"
+                                             t-on-click="() => this.openAction('stm_construction_demo.action_stm_real_estate_units')">
+                                            <span class="stm-r-lbl"><i class="stm-dot-xs is-warn"/> تحت الإنشاء</span>
+                                            <strong class="stm-r-val stm-num"><t t-out="state.data.real_estate.readiness.under_construction"/></strong>
+                                        </div>
+                                        <div class="stm-r-tile is-clickable"
+                                             t-on-click="() => this.openAction('stm_construction_demo.action_stm_real_estate_units')">
+                                            <span class="stm-r-lbl"><i class="stm-dot-xs is-accent"/> جاهز للتسليم</span>
+                                            <strong class="stm-r-val stm-num"><t t-out="state.data.real_estate.readiness.ready"/></strong>
+                                        </div>
+                                        <div class="stm-r-tile is-clickable"
+                                             t-on-click="() => this.openAction('stm_construction_demo.action_stm_real_estate_units')">
+                                            <span class="stm-r-lbl"><i class="stm-dot-xs is-ok"/> تم التسليم</span>
+                                            <strong class="stm-r-val stm-num"><t t-out="state.data.real_estate.readiness.handed_over"/></strong>
                                         </div>
                                     </div>
                                 </div>
@@ -433,12 +455,12 @@
                                         </button>
                                     </div>
                                     <div class="stm-progress-track">
-                                        <div class="stm-progress-fill is-navy"
+                                        <div class="stm-progress-fill"
                                              t-attf-style="width: {{this.materialsConsumedPct}}%"/>
                                     </div>
                                     <div class="stm-mat-vals stm-num">
                                         <span>مستهلك: <t t-out="this.fmtNum(state.data.costs.materials.consumed)"/></span>
-                                        <span class="text-danger">هالك: <t t-out="this.fmtNum(state.data.costs.materials.waste)"/> (<t t-out="state.data.costs.materials.waste_pct"/>%)</span>
+                                        <span class="stm-danger-text">هالك: <t t-out="this.fmtNum(state.data.costs.materials.waste)"/> (<t t-out="state.data.costs.materials.waste_pct"/>%)</span>
                                     </div>
                                 </div>
                             </div>
@@ -446,7 +468,7 @@
                             <!-- Col 2: Progress Certificates & Currency-Safe Contracts -->
                             <div class="stm-panel-card">
                                 <div class="stm-panel-head">
-                                    <h3>المستخلصات وعقود البيع (فصل العملات)</h3>
+                                    <h3>المستخلصات وعقود البيع</h3>
                                     <button type="button" class="stm-link-btn"
                                             t-on-click="() => this.openAction('real_estate_contract.action_real_estate_contract')">
                                         العقود
@@ -465,7 +487,7 @@
                                     </div>
                                     <div class="stm-fin-row">
                                         <span>إجمالي محجوز الضمان (10%)</span>
-                                        <strong class="stm-num text-warning"><t t-out="this.fmtNum(state.data.finance.certificates.total_retention_held)"/> <t t-out="state.data.finance.certificates.currency_symbol"/></strong>
+                                        <strong class="stm-num"><t t-out="this.fmtNum(state.data.finance.certificates.total_retention_held)"/> <t t-out="state.data.finance.certificates.currency_symbol"/></strong>
                                     </div>
                                 </div>
 
@@ -482,7 +504,7 @@
                             </div>
 
                             <!-- Col 3: Liquidity & Regulatory Simulation Card -->
-                            <div class="stm-panel-card is-sim-card">
+                            <div class="stm-panel-card">
                                 <div class="stm-panel-head">
                                     <h3>السيولة والمؤشرات التنظيمية</h3>
                                     <span class="stm-sim-ribbon">محاكاة</span>
@@ -492,7 +514,7 @@
                                 <div class="stm-finance-rows">
                                     <div class="stm-fin-row">
                                         <span>متحصلات متوقعة (60 يوم)</span>
-                                        <strong class="stm-num text-success"><t t-out="this.fmtNum(liq.cash_inflow_expected)"/> <t t-out="liq.currency_symbol"/></strong>
+                                        <strong class="stm-num stm-ok-text"><t t-out="this.fmtNum(liq.cash_inflow_expected)"/> <t t-out="liq.currency_symbol"/></strong>
                                     </div>
                                     <div class="stm-fin-row">
                                         <span>التزامات ومستخلصات (60 يوم)</span>
@@ -500,7 +522,7 @@
                                     </div>
                                     <div class="stm-fin-row">
                                         <span>العجز النقدي المتوقع</span>
-                                        <strong class="stm-num text-danger"><t t-out="this.fmtNum(liq.cash_deficit_amount)"/> <t t-out="liq.currency_symbol"/></strong>
+                                        <strong class="stm-num stm-danger-text"><t t-out="this.fmtNum(liq.cash_deficit_amount)"/> <t t-out="liq.currency_symbol"/></strong>
                                     </div>
                                 </div>
 
@@ -528,7 +550,7 @@
                     <aside class="stm-ai-drawer" t-if="state.aiOpen">
                         <div class="stm-ai-header">
                             <div class="stm-ai-title-wrap">
-                                <span class="stm-ai-avatar"><i class="fa fa-sparkles fa-magic" aria-hidden="true"/></span>
+                                <span class="stm-ai-avatar"><i class="fa fa-magic" aria-hidden="true"/></span>
                                 <div>
                                     <h2 class="stm-ai-title">المساعد الذكي التنفيذي</h2>
                                     <div class="stm-ai-sub">تحليل حي لبيانات المشاريع والتكاليف والسيولة</div>

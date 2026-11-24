@@ -142,12 +142,7 @@
                             <field name="date"/>
                             <field name="project_id"/>
                             <field name="boq_id"/>
-                            <field name="partner_id"
-                                   string="المقاول"
-                                   invisible="certificate_type != 'vendor'"/>
-                            <field name="partner_id"
-                                   string="العميل الخارجي"
-                                   invisible="certificate_type != 'customer'"/>
+                            <field name="partner_id" string="المقاول / العميل"/>
                             <field name="work_scope" placeholder="مثال: مصنعية أعمال العظم"/>
                             <field name="currency_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>

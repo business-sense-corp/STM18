@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from markupsafe import Markup
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
@@ -470,10 +471,9 @@ class ConstructionCertificate(models.Model):
                 }
             )
             rec.message_post(
-                body=(
-                    f"تم جلب الكميات السابقة وما سبق صرفه من المستخلص السابق "
-                    f"<b>{prev_cert.certificate_no or prev_cert.name}</b>."
-                )
+                body=Markup(
+                    "تم جلب الكميات السابقة وما سبق صرفه من المستخلص السابق <b>%s</b>."
+                ) % (prev_cert.certificate_no or prev_cert.name)
             )
         return True
 
@@ -633,7 +633,9 @@ class ConstructionCertificate(models.Model):
         self.write(write_vals)
 
         bill_label = 'مسودة فاتورة مورد' if move_type == 'in_invoice' else 'مسودة فاتورة عميل'
-        self.message_post(body=f"تم إنشاء {bill_label} رقم <b>{move.name or move.id}</b>.")
+        self.message_post(
+            body=Markup("تم إنشاء %s رقم <b>%s</b>.") % (bill_label, move.name or move.id)
+        )
         return self.action_view_account_move()
 
     def action_view_account_move(self):

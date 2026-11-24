@@ -54,11 +54,13 @@
                     <button name="action_populate_standard_scope"
                             type="object"
                             string="تعبئة البنود القياسية (21 بند)"
-                            class="btn-secondary"/>
+                            class="btn-secondary"
+                            invisible="state != 'draft'"/>
                     <button name="action_populate_standard_documents"
                             type="object"
                             string="تعبئة قائمة المستندات القياسية"
-                            class="btn-secondary"/>
+                            class="btn-secondary"
+                            invisible="state != 'draft'"/>
                     <button name="action_set_in_progress"
                             type="object"
                             string="بدء التنفيذ"
@@ -147,20 +149,16 @@
                     </group>
 
                     <!-- Financial & Progress KPI Summary -->
-                    <group string="ملخص التكاليف والميزانية والإنجاز" col="4">
+                    <group string="ملخص التكاليف والميزانية والإنجاز">
                         <group>
                             <field name="total_planned" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             <field name="total_actual" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                        </group>
-                        <group>
                             <field name="total_committed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             <field name="total_etc" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                         </group>
                         <group>
                             <field name="total_eac" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             <field name="budget_variance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                        </group>
-                        <group>
                             <field name="progress_percent" widget="progressbar"/>
                             <field name="cost_burn_percent"/>
                             <field name="is_over_budget" invisible="1"/>
@@ -170,7 +168,7 @@
 
                     <notebook>
                         <page name="boq_lines" string="بنود المقايسة والتكاليف (BOQ)">
-                            <field name="line_ids" widget="one2many_list">
+                            <field name="line_ids">
                                 <list editable="bottom"
                                       decoration-muted="not included"
                                       decoration-info="is_variation_order"
@@ -248,7 +246,7 @@
                                 <field name="docs_uploaded_count"/>
                                 <field name="docs_pending_count"/>
                             </group>
-                            <field name="document_line_ids" widget="one2many_list">
+                            <field name="document_line_ids">
                                 <list editable="bottom"
                                       decoration-success="status == 'approved'"
                                       decoration-info="status == 'uploaded'"
@@ -260,7 +258,7 @@
                                            decoration-warning="status == 'pending'"
                                            decoration-info="status == 'uploaded'"
                                            decoration-success="status == 'approved'"/>
-                                    <field name="attachment_filename" column_invisible="True"/>
+                                    <field name="attachment_filename" string="اسم الملف" optional="show" readonly="1"/>
                                     <field name="attachment_file" filename="attachment_filename" string="المرفق"/>
                                     <field name="notes"/>
                                 </list>

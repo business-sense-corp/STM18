@@ -81,7 +81,7 @@
                     <group>
                         <group string="بيانات العميل والوحدة">
                             <field name="partner_id" readonly="state in ('approved', 'rejected')"/>
-                            <field name="customer_phone" readonly="state in ('approved', 'rejected')"/>
+                            <field name="customer_phone" readonly="state in ('approved', 'rejected')" style="direction: ltr; text-align: right;"/>
                             <field name="product_id" readonly="state in ('approved', 'rejected')"/>
                             <field name="project_categ_id"/>
                             <field name="sale_order_id" readonly="1" invisible="not sale_order_id"/>

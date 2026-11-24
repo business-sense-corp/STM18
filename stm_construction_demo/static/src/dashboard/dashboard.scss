@@ -1,17 +1,25 @@
-// Architectural Blueprint & Desert Limestone Executive Palette
-$stm-navy: #0F223D;
-$stm-navy-soft: #1B365D;
-$stm-canvas: #F4F6F9;
-$stm-card: #FFFFFF;
-$stm-border: #DFE5EE;
-$stm-ink: #162438;
-$stm-muted: #5A6B82;
-$stm-emerald: #0D7A5F;
-$stm-emerald-bg: #EBF7F3;
-$stm-brass: #B88122;
-$stm-brass-bg: #FDF6E7;
-$stm-crimson: #C0392B;
-$stm-crimson-bg: #FDEDEC;
+// Executive Boardroom Ledger Palette (4 Disciplined Tokens + Quiet Semantic Signals)
+$stm-canvas: #F5F6F8;
+$stm-surface: #FFFFFF;
+$stm-subtle: #F8FAFC;
+$stm-border: #E2E7EE;
+$stm-ink: #0F172A;
+$stm-ink-2: #475569;
+$stm-muted: #64748B;
+
+// Signature Architectural Accent
+$stm-accent: #0F4C5C;
+$stm-accent-soft: #EEF5F7;
+
+// Restrained Semantic Signals
+$stm-ok: #0F766E;
+$stm-ok-bg: #F0FDFA;
+$stm-danger: #B42318;
+$stm-danger-bg: #FEF2F2;
+$stm-warn: #B45309;
+$stm-sim-ink: #6B5324;
+$stm-sim-bg: #FAF8F3;
+$stm-sim-border: #E5DEC9;
 
 .o_stm_dashboard {
     width: 100%;
@@ -22,8 +30,8 @@ $stm-crimson-bg: #FDEDEC;
     box-sizing: border-box;
     background: $stm-canvas;
     color: $stm-ink;
-    font-family: "Cairo", "IBM Plex Sans Arabic", "Tajawal", "Segoe UI", Tahoma, sans-serif;
-    padding-bottom: 32px;
+    font-family: "IBM Plex Sans Arabic", "Cairo", "Tajawal", "Segoe UI", Tahoma, sans-serif;
+    padding-bottom: 36px;
 
     *, *::before, *::after {
         box-sizing: border-box;
@@ -34,67 +42,70 @@ $stm-crimson-bg: #FDEDEC;
         unicode-bidi: isolate;
     }
 
+    .stm-ok-text { color: $stm-ok; }
+    .stm-danger-text { color: $stm-danger; }
+
     .is-clickable {
         cursor: pointer;
-        transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+        transition: border-color 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
 
         &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(15, 34, 61, 0.08);
-            border-color: #B9C7DA;
+            transform: translateY(-1px);
+            border-color: #CBD5E1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
         }
     }
 
-    // Top Sticky Command Bar
+    // Light Executive Command Bar
     .stm-cmd-bar {
         position: sticky;
         top: 0;
         z-index: 20;
-        background: linear-gradient(135deg, $stm-navy 0%, #152E52 100%);
-        color: #FFFFFF;
-        padding: 14px 24px;
+        background: $stm-surface;
+        color: $stm-ink;
+        padding: 12px 22px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        gap: 14px;
-        border-bottom: 3px solid $stm-brass;
-        box-shadow: 0 4px 16px rgba(15, 34, 61, 0.16);
+        gap: 12px;
+        border-bottom: 1px solid $stm-border;
     }
 
     .stm-cmd-brand {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
         min-width: 0;
         flex: 1 1 280px;
     }
 
     .stm-cmd-emblem {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        background: rgba(184, 129, 34, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        color: #F3C669;
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        background: $stm-accent-soft;
+        border: 1px solid #D3E4E9;
+        color: $stm-accent;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 19px;
+        font-size: 17px;
+        flex-shrink: 0;
     }
 
     .stm-cmd-title {
         margin: 0;
-        font-size: 18px;
-        font-weight: 700;
-        color: #FFFFFF;
+        font-size: 16.5px;
+        font-weight: 800;
+        color: $stm-ink;
         letter-spacing: -0.01em;
     }
 
     .stm-cmd-subtitle {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.74);
-        margin-top: 2px;
+        font-size: 11.5px;
+        color: $stm-muted;
+        margin-top: 1px;
     }
 
     .stm-cmd-controls {
@@ -109,7 +120,7 @@ $stm-crimson-bg: #FDEDEC;
     .stm-legend-pills {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         margin-inline-end: 4px;
     }
 
@@ -125,192 +136,208 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-pill-live {
-        background: rgba(13, 122, 95, 0.26);
-        border: 1px solid rgba(64, 214, 173, 0.4);
-        color: #D7F8EE;
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
+        color: $stm-ink-2;
     }
 
     .stm-dot-live {
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #3EE0B2;
+        background: $stm-ok;
     }
 
     .stm-pill-sim {
-        background: rgba(184, 129, 34, 0.24);
-        border: 1px solid rgba(243, 198, 105, 0.45);
-        color: #FCE6B4;
+        background: $stm-sim-bg;
+        border: 1px solid $stm-sim-border;
+        color: $stm-sim-ink;
     }
 
     .stm-project-select {
-        background: rgba(255, 255, 255, 0.12);
-        color: #FFFFFF;
-        border: 1px solid rgba(255, 255, 255, 0.28);
+        background: $stm-subtle;
+        color: $stm-ink;
+        border: 1px solid #CBD5E1;
         border-radius: 8px;
         padding: 6px 10px;
-        font-size: 13px;
-        width: 210px;
+        font-size: 12.5px;
+        font-weight: 600;
+        width: 215px;
         max-width: 100%;
         text-overflow: ellipsis;
 
-        option {
-            color: $stm-ink;
-            background: #FFFFFF;
+        &:focus {
+            outline: none;
+            border-color: $stm-accent;
         }
     }
 
     .stm-btn-ghost {
-        background: rgba(255, 255, 255, 0.12);
-        color: #FFFFFF;
-        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: $stm-surface;
+        color: $stm-ink-2;
+        border: 1px solid #CBD5E1;
         border-radius: 8px;
         padding: 6px 12px;
-        font-size: 13px;
+        font-size: 12.5px;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 6px;
         cursor: pointer;
 
         &:hover {
-            background: rgba(255, 255, 255, 0.22);
+            background: $stm-subtle;
+            color: $stm-ink;
         }
     }
 
     .stm-btn-ai {
-        background: $stm-brass;
+        background: $stm-accent;
         color: #FFFFFF;
-        border: none;
+        border: 1px solid $stm-accent;
         border-radius: 8px;
-        padding: 7px 14px;
-        font-size: 13px;
+        padding: 6px 13px;
+        font-size: 12.5px;
         font-weight: 700;
         display: inline-flex;
         align-items: center;
         gap: 7px;
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
 
         &:hover {
-            background: #9E6E1C;
+            background: #0B3A47;
         }
     }
 
-    .stm-mini-sim {
-        background: $stm-brass-bg;
-        color: #875B0E;
-        border: 1px solid rgba(184, 129, 34, 0.35);
+    .stm-btn-ai-tag {
+        background: rgba(255, 255, 255, 0.16);
+        color: #FFFFFF;
         border-radius: 999px;
         padding: 1px 7px;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .stm-mini-sim {
+        background: $stm-sim-bg;
+        color: $stm-sim-ink;
+        border: 1px solid $stm-sim-border;
+        border-radius: 999px;
+        padding: 1px 8px;
         font-size: 10px;
         font-weight: 700;
     }
 
     .stm-mini-live {
-        background: $stm-emerald-bg;
-        color: $stm-emerald;
-        border: 1px solid rgba(13, 122, 95, 0.25);
+        background: $stm-subtle;
+        color: $stm-ink-2;
+        border: 1px solid $stm-border;
         border-radius: 999px;
         padding: 2px 8px;
-        font-size: 11px;
-        font-weight: 700;
+        font-size: 10.5px;
+        font-weight: 600;
     }
 
     .stm-sim-ribbon {
-        background: $stm-brass-bg;
-        color: #875B0E;
-        border: 1px solid #E5C17B;
+        background: $stm-sim-bg;
+        color: $stm-sim-ink;
+        border: 1px solid $stm-sim-border;
         border-radius: 6px;
-        padding: 2px 9px;
-        font-size: 11px;
+        padding: 2px 8px;
+        font-size: 10.5px;
         font-weight: 700;
     }
 
     .stm-loading-state {
-        padding: 60px 24px;
+        padding: 64px 24px;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 12px;
         color: $stm-muted;
-        font-size: 15px;
+        font-size: 14px;
     }
 
-    // Group 5: Alert Strip
+    // Restrained Alert Ticker
     .stm-alert-strip {
-        background: #FFFFFF;
+        background: $stm-canvas;
         border-bottom: 1px solid $stm-border;
-        padding: 10px 24px;
+        padding: 9px 22px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
     }
 
     .stm-alert-label {
-        font-size: 12px;
+        font-size: 11.5px;
         font-weight: 700;
-        color: $stm-navy;
+        color: $stm-ink-2;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
     }
 
     .stm-alert-pills {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 7px;
     }
 
     .stm-alert-pill {
+        background: $stm-surface;
+        color: $stm-ink;
+        border: 1px solid $stm-border;
         border-radius: 999px;
-        padding: 5px 12px;
-        font-size: 12px;
+        padding: 4px 11px;
+        font-size: 11.5px;
         display: inline-flex;
         align-items: center;
         gap: 6px;
         cursor: pointer;
-        border: 1px solid transparent;
-        transition: filter 0.12s ease;
+        transition: border-color 0.12s ease, background 0.12s ease;
 
         &:hover {
-            filter: brightness(0.96);
+            background: $stm-subtle;
+            border-color: #CBD5E1;
         }
 
-        &.is-critical {
-            background: $stm-crimson-bg;
-            color: #96281B;
-            border-color: rgba(192, 57, 43, 0.35);
+        .stm-alert-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        &.is-warning {
-            background: $stm-brass-bg;
-            color: #7D520A;
-            border-color: rgba(184, 129, 34, 0.35);
-        }
-
-        &.is-info {
-            background: #EAF2FA;
-            color: $stm-navy-soft;
-            border-color: rgba(27, 54, 93, 0.25);
-        }
+        &.is-critical .stm-alert-dot { background: $stm-danger; }
+        &.is-warning .stm-alert-dot { background: $stm-warn; }
+        &.is-info .stm-alert-dot { background: $stm-accent; }
     }
 
     .stm-alert-pill-title {
         font-weight: 700;
+        color: $stm-ink;
+    }
+
+    .stm-alert-pill-sep {
+        color: #CBD5E1;
+    }
+
+    .stm-alert-pill-detail {
+        color: $stm-ink-2;
     }
 
     .stm-alert-arrow {
-        font-size: 10px;
-        opacity: 0.7;
+        font-size: 11px;
+        color: $stm-muted;
     }
 
-    // Main Workspace Grid
+    // Main Asymmetric Workspace
     .stm-workspace {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 350px;
-        gap: 18px;
-        padding: 18px 20px 0;
+        grid-template-columns: minmax(0, 1fr) 365px;
+        gap: 16px;
+        padding: 16px 22px 0;
         align-items: start;
         width: 100%;
         max-width: 100%;
@@ -327,11 +354,28 @@ $stm-crimson-bg: #FDEDEC;
     .stm-canvas {
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 16px;
         min-width: 0;
     }
 
-    // Row 1: 4 KPI Cards
+    // Small Semantic Dots
+    .stm-sig-dot,
+    .stm-dot-xs {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+
+        &.is-danger { background: $stm-danger; }
+        &.is-warn { background: $stm-warn; }
+        &.is-ok { background: $stm-ok; }
+        &.is-accent { background: $stm-accent; }
+        &.is-slate { background: #94A3B8; }
+        &.is-ink { background: $stm-ink; }
+    }
+
+    // Row 1: 4 Uniform KPI Cards
     .stm-kpi-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -348,10 +392,10 @@ $stm-crimson-bg: #FDEDEC;
 
     .stm-kpi-card {
         min-width: 0;
-        background: $stm-card;
+        background: $stm-surface;
         border: 1px solid $stm-border;
-        border-radius: 12px;
-        padding: 14px 15px;
+        border-radius: 10px;
+        padding: 14px 16px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -373,32 +417,36 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-kpi-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 9px;
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        background: #F1F5F9;
+        color: #334155;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 15px;
+        font-size: 13.5px;
         flex-shrink: 0;
-
-        &.is-navy { background: #EAF0F7; color: $stm-navy; }
-        &.is-crimson { background: $stm-crimson-bg; color: $stm-crimson; }
-        &.is-emerald { background: $stm-emerald-bg; color: $stm-emerald; }
-        &.is-brass { background: $stm-brass-bg; color: $stm-brass; }
     }
 
     .stm-kpi-value {
-        font-size: 23px;
+        font-size: 22px;
         font-weight: 800;
-        color: $stm-navy;
+        color: $stm-ink;
         line-height: 1.15;
 
         .stm-kpi-unit {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             color: $stm-muted;
             margin-inline-start: 4px;
+        }
+
+        .stm-kpi-draft-note {
+            font-size: 11px;
+            font-weight: 600;
+            color: $stm-muted;
+            margin-inline-start: 6px;
         }
     }
 
@@ -416,8 +464,8 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-progress-track {
-        height: 7px;
-        background: #E8EEF5;
+        height: 5px;
+        background: #E8EDF3;
         border-radius: 999px;
         overflow: hidden;
     }
@@ -425,17 +473,21 @@ $stm-crimson-bg: #FDEDEC;
     .stm-progress-fill {
         height: 100%;
         border-radius: 999px;
-
-        &.is-emerald { background: $stm-emerald; }
-        &.is-navy { background: $stm-navy; }
+        background: $stm-accent;
     }
 
     .stm-kpi-subrow {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        font-size: 12px;
-        color: $stm-muted;
+        font-size: 11.5px;
+        color: $stm-ink-2;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
     }
 
     .stm-kpi-foot {
@@ -444,36 +496,50 @@ $stm-crimson-bg: #FDEDEC;
         justify-content: space-between;
         gap: 6px;
         padding-top: 8px;
-        border-top: 1px dashed #E6ECF3;
+        border-top: 1px solid #F1F5F9;
         font-size: 11px;
     }
 
-    .stm-tag-danger { color: $stm-crimson; font-weight: 700; }
-    .stm-tag-warn { color: #94620B; font-weight: 700; }
-    .stm-tag-ok { color: $stm-emerald; font-weight: 700; }
+    .stm-tag-danger {
+        color: $stm-danger;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .stm-tag-warn {
+        color: $stm-warn;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .stm-tag-ok { color: $stm-ok; font-weight: 600; }
     .stm-tag-neutral { color: $stm-muted; font-weight: 600; }
+
     .stm-tag-sim {
-        color: $stm-navy-soft;
-        background: #EEF4FA;
-        padding: 2px 8px;
-        border-radius: 6px;
+        color: $stm-sim-ink;
+        background: $stm-sim-bg;
+        border: 1px solid $stm-sim-border;
+        padding: 1px 7px;
+        border-radius: 999px;
         font-weight: 600;
     }
 
     .stm-drill-hint {
-        color: $stm-navy-soft;
+        color: $stm-accent;
         font-weight: 700;
         white-space: nowrap;
     }
 
-    // Row 2: Signature 10-Unit Block Card
+    // Row 2: Signature 10-Unit Block Architectural Economics Ledger
     .stm-block-hero {
-        background: $stm-card;
+        background: $stm-surface;
         border: 1px solid $stm-border;
-        border-inline-start: 5px solid $stm-emerald;
-        border-radius: 14px;
+        border-radius: 12px;
         padding: 18px 20px;
-        box-shadow: 0 4px 18px rgba(15, 34, 61, 0.04);
     }
 
     .stm-block-header {
@@ -488,45 +554,46 @@ $stm-crimson-bg: #FDEDEC;
     .stm-eyebrow {
         font-size: 11px;
         font-weight: 700;
-        color: $stm-emerald;
+        color: $stm-accent;
         margin-bottom: 2px;
     }
 
     .stm-block-title {
         margin: 0;
-        font-size: 17px;
+        font-size: 16.5px;
         font-weight: 800;
-        color: $stm-navy;
+        color: $stm-ink;
 
         .stm-block-proj {
             font-weight: 500;
             color: $stm-muted;
-            font-size: 14px;
+            font-size: 13.5px;
         }
     }
 
     .stm-btn-edit {
-        background: #F4F7FB;
-        color: $stm-navy;
+        background: $stm-subtle;
+        color: $stm-ink-2;
         border: 1px solid $stm-border;
         border-radius: 8px;
         padding: 6px 12px;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 6px;
         cursor: pointer;
 
         &:hover {
-            background: #E7EEF7;
+            background: #F1F5F9;
+            color: $stm-ink;
         }
     }
 
     .stm-block-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.8fr) minmax(260px, 1fr);
-        gap: 16px;
+        grid-template-columns: minmax(0, 1.85fr) minmax(260px, 1fr);
+        gap: 14px;
         align-items: stretch;
 
         @media (max-width: 960px) {
@@ -535,8 +602,8 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-block-col {
-        background: #F9FBFD;
-        border: 1px solid #E5ECF4;
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
         border-radius: 10px;
         padding: 12px 14px;
         display: flex;
@@ -551,9 +618,9 @@ $stm-crimson-bg: #FDEDEC;
         justify-content: space-between;
         align-items: center;
         gap: 8px;
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 700;
-        color: $stm-navy;
+        color: $stm-ink;
     }
 
     .stm-variance-badge {
@@ -561,15 +628,25 @@ $stm-crimson-bg: #FDEDEC;
         border-radius: 999px;
         font-size: 11px;
         font-weight: 700;
+        border: 1px solid transparent;
 
-        &.is-over { background: $stm-crimson-bg; color: $stm-crimson; }
-        &.is-ok { background: $stm-emerald-bg; color: $stm-emerald; }
+        &.is-over {
+            background: $stm-danger-bg;
+            color: $stm-danger;
+            border-color: #FECACA;
+        }
+
+        &.is-ok {
+            background: $stm-ok-bg;
+            color: $stm-ok;
+            border-color: #CCFBF1;
+        }
     }
 
     .stm-equation-row {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 10px;
+        gap: 8px;
 
         @media (max-width: 1360px) {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -577,8 +654,8 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-eq-box {
-        background: #FFFFFF;
-        border: 1px solid #E4EAF2;
+        background: $stm-surface;
+        border: 1px solid $stm-border;
         border-radius: 8px;
         padding: 9px 10px;
         display: flex;
@@ -586,8 +663,8 @@ $stm-crimson-bg: #FDEDEC;
         gap: 3px;
 
         &.is-total {
-            background: #F0F5FB;
-            border-color: #BBD0EA;
+            border-color: #B9CDD4;
+            background: #F6FAFB;
         }
     }
 
@@ -598,12 +675,12 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-eq-val {
-        font-size: 15px;
+        font-size: 14.5px;
         font-weight: 800;
-        color: $stm-navy;
+        color: $stm-ink;
 
         small {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
             color: $stm-muted;
         }
@@ -614,11 +691,12 @@ $stm-crimson-bg: #FDEDEC;
         color: $stm-muted;
     }
 
+    // Obsidian Charcoal Margin Focal Panel
     .stm-unit-seal {
-        background: linear-gradient(145deg, #0D7A5F 0%, #095D48 100%);
+        background: $stm-ink;
         color: #FFFFFF;
-        border-radius: 12px;
-        padding: 14px 16px;
+        border-radius: 10px;
+        padding: 15px 17px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -635,21 +713,23 @@ $stm-crimson-bg: #FDEDEC;
     .stm-seal-lbl {
         font-size: 12px;
         font-weight: 700;
-        color: rgba(255, 255, 255, 0.86);
+        color: #E2E8F0;
     }
 
     .stm-seal-formula {
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.72);
+        color: #94A3B8;
         margin-top: 2px;
+        display: inline-block;
     }
 
     .stm-seal-pct {
-        background: rgba(255, 255, 255, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.32);
-        border-radius: 10px;
-        padding: 4px 10px;
-        font-size: 17px;
+        background: rgba(15, 118, 110, 0.28);
+        color: #5EEAD4;
+        border: 1px solid rgba(94, 234, 212, 0.35);
+        border-radius: 8px;
+        padding: 3px 10px;
+        font-size: 16px;
         font-weight: 800;
     }
 
@@ -657,12 +737,13 @@ $stm-crimson-bg: #FDEDEC;
         font-size: 27px;
         font-weight: 800;
         line-height: 1.1;
+        color: #FFFFFF;
 
         span {
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 600;
             margin-inline-start: 4px;
-            opacity: 0.9;
+            color: #CBD5E1;
         }
     }
 
@@ -673,15 +754,20 @@ $stm-crimson-bg: #FDEDEC;
         gap: 8px;
         font-size: 11.5px;
         padding-top: 8px;
-        border-top: 1px solid rgba(255, 255, 255, 0.22);
-        color: rgba(255, 255, 255, 0.9);
+        border-top: 1px solid rgba(255, 255, 255, 0.14);
+        color: #CBD5E1;
+
+        strong {
+            color: #FFFFFF;
+        }
     }
 
+    // Calm Neutral Cash Separation Strip
     .stm-cash-separation {
         margin-top: 12px;
-        background: $stm-brass-bg;
-        border: 1px solid #ECD29B;
-        border-radius: 9px;
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
+        border-radius: 8px;
         padding: 9px 14px;
         display: flex;
         flex-wrap: wrap;
@@ -693,7 +779,7 @@ $stm-crimson-bg: #FDEDEC;
     .stm-cash-metrics {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 14px;
         font-size: 12px;
         color: $stm-ink;
     }
@@ -703,12 +789,12 @@ $stm-crimson-bg: #FDEDEC;
         align-items: center;
         gap: 6px;
 
-        &.is-muted { color: $stm-muted; }
+        &.is-muted { color: $stm-ink-2; }
     }
 
     .stm-accounting-rule {
-        font-size: 12px;
-        color: #7A4F08;
+        font-size: 11.5px;
+        color: $stm-accent;
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -719,6 +805,7 @@ $stm-crimson-bg: #FDEDEC;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 14px;
+        align-items: stretch;
 
         @media (max-width: 1260px) {
             grid-template-columns: 1fr;
@@ -727,17 +814,13 @@ $stm-crimson-bg: #FDEDEC;
 
     .stm-panel-card {
         min-width: 0;
-        background: $stm-card;
+        background: $stm-surface;
         border: 1px solid $stm-border;
-        border-radius: 12px;
-        padding: 15px;
+        border-radius: 10px;
+        padding: 15px 16px;
         display: flex;
         flex-direction: column;
         gap: 12px;
-
-        &.is-sim-card {
-            border-top: 3px solid $stm-brass;
-        }
     }
 
     .stm-panel-head {
@@ -748,9 +831,9 @@ $stm-crimson-bg: #FDEDEC;
 
         h3 {
             margin: 0;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 800;
-            color: $stm-navy;
+            color: $stm-ink;
         }
     }
 
@@ -778,24 +861,24 @@ $stm-crimson-bg: #FDEDEC;
     .stm-swatch {
         width: 9px;
         height: 9px;
-        border-radius: 3px;
+        border-radius: 2px;
         display: inline-block;
 
-        &.is-planned { background: #94A3B8; }
-        &.is-actual { background: $stm-navy; }
-        &.is-eac { background: $stm-brass; }
+        &.is-planned { background: #CBD5E1; }
+        &.is-actual { background: $stm-accent; }
+        &.is-eac { background: #64748B; }
     }
 
     .stm-svg-bar-list {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 9px;
     }
 
     .stm-bar-item {
-        background: #F8FAFC;
-        border: 1px solid #E7EDF5;
-        border-radius: 9px;
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
+        border-radius: 8px;
         padding: 9px 11px;
         display: flex;
         flex-direction: column;
@@ -812,16 +895,16 @@ $stm-crimson-bg: #FDEDEC;
 
     .stm-bar-title {
         font-weight: 700;
-        color: $stm-navy;
+        color: $stm-ink;
         display: inline-flex;
         align-items: center;
         gap: 6px;
     }
 
     .stm-early-badge {
-        background: $stm-crimson-bg;
-        color: $stm-crimson;
-        border: 1px solid rgba(192, 57, 43, 0.35);
+        background: $stm-danger-bg;
+        color: $stm-danger;
+        border: 1px solid #FECACA;
         border-radius: 999px;
         padding: 1px 7px;
         font-size: 10px;
@@ -835,7 +918,7 @@ $stm-crimson-bg: #FDEDEC;
 
     .stm-svg-bars {
         width: 100%;
-        height: 30px;
+        height: 28px;
         display: block;
     }
 
@@ -847,27 +930,34 @@ $stm-crimson-bg: #FDEDEC;
         color: $stm-muted;
     }
 
-    // Donut Widget
+    // Unit Donut & Compact Readiness Panel
+    .stm-unit-card {
+        justify-content: space-between;
+    }
+
     .stm-donut-wrap {
         display: flex;
         align-items: center;
-        gap: 18px;
+        justify-content: flex-start;
+        gap: 24px;
+        padding: 6px 0;
 
         @media (max-width: 560px) {
             flex-direction: column;
+            align-items: flex-start;
         }
     }
 
     .stm-donut-svg {
-        width: 138px;
-        height: 138px;
+        width: 132px;
+        height: 132px;
         flex-shrink: 0;
     }
 
     .stm-donut-center-num {
         font-size: 22px;
         font-weight: 800;
-        fill: $stm-navy;
+        fill: $stm-ink;
     }
 
     .stm-donut-center-lbl {
@@ -879,9 +969,10 @@ $stm-crimson-bg: #FDEDEC;
     .stm-donut-stats {
         flex: 1;
         min-width: 0;
+        max-width: 230px;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 7px;
     }
 
     .stm-stat-group-title {
@@ -893,47 +984,83 @@ $stm-crimson-bg: #FDEDEC;
     .stm-stat-row {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 4px 0;
+        border-bottom: 1px solid #F1F5F9;
         font-size: 12.5px;
+        color: $stm-ink-2;
+
+        &:last-child {
+            border-bottom: none;
+        }
 
         span {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
+        }
+
+        strong {
+            color: $stm-ink;
         }
     }
 
     .stm-dot {
-        width: 9px;
-        height: 9px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         display: inline-block;
 
-        &.is-emerald { background: $stm-emerald; }
-        &.is-brass { background: $stm-brass; }
-        &.is-navy { background: $stm-navy; }
+        &.is-accent { background: $stm-accent; }
+        &.is-slate { background: #94A3B8; }
+        &.is-ink { background: $stm-ink; }
     }
 
-    .stm-readiness-chips {
+    .stm-readiness-panel {
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid $stm-border;
         display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
+        flex-direction: column;
+        gap: 8px;
     }
 
-    .stm-r-chip {
-        font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-weight: 600;
+    .stm-readiness-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
 
-        &.is-warn { background: $stm-brass-bg; color: #7D520A; }
-        &.is-info { background: #EAF2FA; color: $stm-navy-soft; }
-        &.is-ok { background: $stm-emerald-bg; color: $stm-emerald; }
+    .stm-r-tile {
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
+        border-radius: 8px;
+        padding: 8px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .stm-r-lbl {
+        font-size: 11px;
+        color: $stm-muted;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .stm-r-val {
+        font-size: 17px;
+        font-weight: 800;
+        color: $stm-ink;
     }
 
     .stm-link-btn {
         background: transparent;
         border: none;
-        color: $stm-navy-soft;
+        color: $stm-accent;
         font-size: 12px;
         font-weight: 700;
         cursor: pointer;
@@ -947,6 +1074,7 @@ $stm-crimson-bg: #FDEDEC;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 14px;
+        align-items: stretch;
 
         @media (max-width: 1320px) {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -964,8 +1092,9 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-delay-row {
-        background: #FFF8F7;
-        border: 1px solid #F5D2CE;
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
+        border-inline-start: 3px solid $stm-danger;
         border-radius: 8px;
         padding: 8px 10px;
         display: flex;
@@ -975,9 +1104,9 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-delay-name {
-        font-size: 12.5px;
+        font-size: 12px;
         font-weight: 700;
-        color: $stm-navy;
+        color: $stm-ink;
     }
 
     .stm-delay-reason {
@@ -986,8 +1115,9 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-delay-days {
-        background: $stm-crimson;
-        color: #FFFFFF;
+        background: $stm-danger-bg;
+        color: $stm-danger;
+        border: 1px solid #FECACA;
         border-radius: 6px;
         padding: 2px 8px;
         font-size: 11px;
@@ -997,8 +1127,8 @@ $stm-crimson-bg: #FDEDEC;
 
     .stm-empty-note {
         font-size: 12px;
-        color: $stm-emerald;
-        background: $stm-emerald-bg;
+        color: $stm-ok;
+        background: $stm-ok-bg;
         padding: 8px 10px;
         border-radius: 8px;
     }
@@ -1006,7 +1136,7 @@ $stm-crimson-bg: #FDEDEC;
     .stm-materials-box {
         margin-top: auto;
         padding-top: 10px;
-        border-top: 1px dashed #E4EAF2;
+        border-top: 1px solid #F1F5F9;
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -1023,7 +1153,7 @@ $stm-crimson-bg: #FDEDEC;
     .stm-finance-rows {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 7px;
     }
 
     .stm-fin-row {
@@ -1031,16 +1161,21 @@ $stm-crimson-bg: #FDEDEC;
         justify-content: space-between;
         align-items: center;
         padding: 7px 10px;
-        background: #F8FAFC;
-        border: 1px solid #E8EEF5;
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
         border-radius: 8px;
         font-size: 12px;
+        color: $stm-ink-2;
+
+        strong {
+            color: $stm-ink;
+        }
     }
 
     .stm-currency-split {
         margin-top: auto;
         padding-top: 10px;
-        border-top: 1px dashed #E4EAF2;
+        border-top: 1px solid #F1F5F9;
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -1050,19 +1185,19 @@ $stm-crimson-bg: #FDEDEC;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #F4F7FB;
-        border: 1px solid #DCE5F0;
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
         border-radius: 7px;
         padding: 6px 10px;
         font-size: 12px;
     }
 
     .stm-cur-code {
-        background: $stm-navy;
+        background: $stm-ink;
         color: #FFFFFF;
         border-radius: 5px;
         padding: 1px 7px;
-        font-size: 11px;
+        font-size: 10.5px;
         font-weight: 700;
     }
 
@@ -1073,15 +1208,15 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-reg-box {
-        background: $stm-brass-bg;
-        border: 1px solid #ECD29B;
+        background: $stm-subtle;
+        border: 1px solid $stm-border;
         border-radius: 8px;
         padding: 8px 10px;
     }
 
     .stm-reg-lbl {
         font-size: 11px;
-        color: #7D520A;
+        color: $stm-muted;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -1089,45 +1224,46 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-reg-val {
-        font-size: 15px;
+        font-size: 14.5px;
         font-weight: 800;
-        color: $stm-navy;
+        color: $stm-ink;
         margin-top: 4px;
     }
 
     .stm-btn-outline-full {
         margin-top: auto;
         width: 100%;
-        background: #FFFFFF;
-        color: $stm-navy;
+        background: $stm-surface;
+        color: $stm-ink-2;
         border: 1px solid $stm-border;
         border-radius: 8px;
         padding: 7px 12px;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
         cursor: pointer;
 
-        &:hover { background: #F4F7FB; }
+        &:hover {
+            background: $stm-subtle;
+            color: $stm-ink;
+        }
     }
 
-    // Docked AI Assistant Panel (T3.4)
+    // Calm Docked AI Assistant Panel (T3.4)
     .stm-ai-drawer {
         min-width: 0;
-        background: $stm-card;
+        background: $stm-surface;
         border: 1px solid $stm-border;
-        border-top: 4px solid $stm-navy;
-        border-radius: 14px;
+        border-radius: 12px;
         padding: 15px;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 11px;
         position: sticky;
-        top: 84px;
-        box-shadow: 0 8px 26px rgba(15, 34, 61, 0.08);
+        top: 76px;
     }
 
     .stm-ai-header {
@@ -1144,22 +1280,24 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-ai-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: $stm-navy;
-        color: #F3C669;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: $stm-accent-soft;
+        border: 1px solid #D3E4E9;
+        color: $stm-accent;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
+        font-size: 15px;
+        flex-shrink: 0;
     }
 
     .stm-ai-title {
         margin: 0;
-        font-size: 15px;
+        font-size: 14.5px;
         font-weight: 800;
-        color: $stm-navy;
+        color: $stm-ink;
     }
 
     .stm-ai-sub {
@@ -1176,13 +1314,13 @@ $stm-crimson-bg: #FDEDEC;
     .stm-scenario-pill {
         width: 100%;
         text-align: start;
-        background: #F6F8FB;
-        color: $stm-navy;
+        background: $stm-subtle;
+        color: $stm-ink-2;
         border: 1px solid $stm-border;
-        border-radius: 9px;
+        border-radius: 8px;
         padding: 8px 11px;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -1190,14 +1328,15 @@ $stm-crimson-bg: #FDEDEC;
         transition: all 0.12s ease;
 
         &:hover {
-            background: #EAF1FA;
-            border-color: #B4C8E2;
+            background: #F1F5F9;
+            color: $stm-ink;
         }
 
         &.is-active {
-            background: $stm-navy;
-            color: #FFFFFF;
-            border-color: $stm-navy;
+            background: $stm-accent-soft;
+            color: $stm-accent;
+            border: 1.5px solid $stm-accent;
+            font-weight: 700;
         }
     }
 
@@ -1208,21 +1347,22 @@ $stm-crimson-bg: #FDEDEC;
 
     .stm-ai-input {
         flex: 1;
+        min-width: 0;
         border: 1px solid $stm-border;
         border-radius: 8px;
         padding: 7px 10px;
         font-size: 12px;
         color: $stm-ink;
-        background: #FFFFFF;
+        background: $stm-surface;
 
         &:focus {
             outline: none;
-            border-color: $stm-navy;
+            border-color: $stm-accent;
         }
     }
 
     .stm-ai-send {
-        background: $stm-emerald;
+        background: $stm-accent;
         color: #FFFFFF;
         border: none;
         border-radius: 8px;
@@ -1231,11 +1371,11 @@ $stm-crimson-bg: #FDEDEC;
         font-weight: 700;
         cursor: pointer;
 
-        &:hover { background: #0A624C; }
+        &:hover { background: #0B3A47; }
     }
 
     .stm-ai-thinking {
-        padding: 28px 12px;
+        padding: 26px 12px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1245,17 +1385,13 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-ai-card {
-        background: #F9FBFD;
+        background: $stm-subtle;
         border: 1px solid $stm-border;
-        border-radius: 11px;
+        border-radius: 10px;
         padding: 13px;
         display: flex;
         flex-direction: column;
         gap: 10px;
-
-        &.is-critical { border-inline-start: 4px solid $stm-crimson; }
-        &.is-warning { border-inline-start: 4px solid $stm-brass; }
-        &.is-info { border-inline-start: 4px solid $stm-navy; }
     }
 
     .stm-ai-card-top {
@@ -1270,29 +1406,29 @@ $stm-crimson-bg: #FDEDEC;
         font-size: 11px;
         font-weight: 700;
 
-        &.is-critical { background: $stm-crimson-bg; color: $stm-crimson; }
-        &.is-warning { background: $stm-brass-bg; color: #7D520A; }
-        &.is-info { background: #EAF2FA; color: $stm-navy-soft; }
+        &.is-critical { background: $stm-danger-bg; color: $stm-danger; }
+        &.is-warning { background: $stm-sim-bg; color: $stm-warn; }
+        &.is-info { background: $stm-accent-soft; color: $stm-accent; }
     }
 
     .stm-ai-card-title {
         margin: 0;
-        font-size: 14px;
+        font-size: 13.5px;
         font-weight: 800;
-        color: $stm-navy;
+        color: $stm-ink;
     }
 
     .stm-ai-summary {
         margin: 0;
         font-size: 12px;
-        color: $stm-ink;
+        color: $stm-ink-2;
         line-height: 1.55;
     }
 
     .stm-ai-callout {
-        background: $stm-crimson-bg;
-        color: #8F2217;
-        border: 1px solid rgba(192, 57, 43, 0.25);
+        background: $stm-danger-bg;
+        color: #991B1B;
+        border: 1px solid #FECACA;
         border-radius: 8px;
         padding: 8px 10px;
         font-size: 11.5px;
@@ -1317,25 +1453,25 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-finding-item {
-        background: #FFFFFF;
-        border: 1px solid #E4EAF2;
+        background: $stm-surface;
+        border: 1px solid $stm-border;
         border-radius: 7px;
         padding: 7px 9px;
         font-size: 11.5px;
 
-        &.is-critical { border-inline-start: 3px solid $stm-crimson; }
-        &.is-warning { border-inline-start: 3px solid $stm-brass; }
-        &.is-success { border-inline-start: 3px solid $stm-emerald; }
+        &.is-critical { border-inline-start: 3px solid $stm-danger; }
+        &.is-warning { border-inline-start: 3px solid $stm-warn; }
+        &.is-success { border-inline-start: 3px solid $stm-ok; }
     }
 
     .stm-finding-lbl {
         font-weight: 700;
-        color: $stm-navy;
+        color: $stm-ink;
         margin-bottom: 2px;
     }
 
     .stm-finding-val {
-        color: $stm-muted;
+        color: $stm-ink-2;
         line-height: 1.4;
     }
 
@@ -1346,27 +1482,28 @@ $stm-crimson-bg: #FDEDEC;
     }
 
     .stm-source-btn {
-        background: #EAF1FA;
-        color: $stm-navy;
-        border: 1px solid #C6D7EC;
+        background: $stm-surface;
+        color: $stm-ink;
+        border: 1px solid #CBD5E1;
         border-radius: 7px;
         padding: 4px 9px;
         font-size: 11px;
-        font-weight: 700;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 5px;
         cursor: pointer;
 
         &:hover {
-            background: $stm-navy;
-            color: #FFFFFF;
+            background: $stm-accent-soft;
+            border-color: $stm-accent;
+            color: $stm-accent;
         }
     }
 
     .stm-ai-action-box {
-        background: $stm-emerald-bg;
-        border: 1px solid rgba(13, 122, 95, 0.25);
+        background: $stm-accent-soft;
+        border: 1px solid #CBE1E6;
         border-radius: 8px;
         padding: 9px 11px;
     }
@@ -1374,7 +1511,7 @@ $stm-crimson-bg: #FDEDEC;
     .stm-ai-action-lbl {
         font-size: 11.5px;
         font-weight: 800;
-        color: $stm-emerald;
+        color: $stm-accent;
         display: flex;
         align-items: center;
         gap: 6px;

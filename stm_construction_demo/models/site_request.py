@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from markupsafe import Markup
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
@@ -221,7 +222,7 @@ class ConstructionSiteRequest(models.Model):
                     'state': 'done',
                 }
             )
-            rec.message_post(body=f'تم إنشاء طلب الشراء (RFQ): <b>{po.name}</b>.')
+            rec.message_post(body=Markup('تم إنشاء طلب الشراء (RFQ): <b>%s</b>.') % po.name)
         return self.action_view_purchase_order()
 
     def _get_or_create_site_location(self, warehouse, project):
@@ -322,7 +323,7 @@ class ConstructionSiteRequest(models.Model):
                 }
             )
             rec.message_post(
-                body=f'تم إنشاء الإذن المخزني <b>{picking.name}</b> ({origin_label}).'
+                body=Markup('تم إنشاء الإذن المخزني <b>%s</b> (%s).') % (picking.name, origin_label)
             )
         return self.action_view_picking()
 

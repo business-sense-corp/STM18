@@ -38,6 +38,31 @@ class ProductTemplate(models.Model):
         'construction.unit.cost',
         string='بطاقة تكلفة البلوك',
     )
+    stm_currency_id = fields.Many2one(
+        'res.currency',
+        string='عملة الوحدة العقارية',
+        compute='_compute_stm_currency_id',
+    )
+
+    @api.depends(
+        'stm_unit_cost_id.currency_id',
+        'stm_project_id.stm_currency_id',
+        'stm_is_real_estate_unit',
+        'currency_id',
+    )
+    def _compute_stm_currency_id(self):
+        sar = self.env['res.currency'].search(
+            [('name', '=', 'SAR'), ('active', '=', True)], limit=1
+        )
+        for rec in self:
+            if rec.stm_unit_cost_id and rec.stm_unit_cost_id.currency_id:
+                rec.stm_currency_id = rec.stm_unit_cost_id.currency_id
+            elif rec.stm_project_id and rec.stm_project_id.stm_currency_id:
+                rec.stm_currency_id = rec.stm_project_id.stm_currency_id
+            elif rec.stm_is_real_estate_unit and sar:
+                rec.stm_currency_id = sar
+            else:
+                rec.stm_currency_id = rec.currency_id
 
 
 class RealEstateContract(models.Model):

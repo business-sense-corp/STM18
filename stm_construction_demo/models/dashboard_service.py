@@ -34,17 +34,26 @@ class ConstructionDashboardService(models.AbstractModel):
         has_proj_stm = 'stm_delay_days' in self.env['project.project']._fields
 
         Project = self.env['project.project']
-        all_projects = Project.search([], order='id desc')
+        if has_proj_stm and has_boq:
+            all_projects = Project.search([('stm_boq_id', '!=', False)], order='id desc')
+            if not all_projects:
+                all_projects = Project.search([], order='id desc')
+        else:
+            all_projects = Project.search([], order='id desc')
         project_options = [{'id': p.id, 'name': p.name} for p in all_projects]
 
         target_projects = all_projects.filtered(lambda p: p.id == project_id) if project_id else all_projects
 
         # --- Group 1 & 2: Projects, BOQs, Delays & Costs ---
+        all_boqs = self.env['construction.boq']
         boqs = self.env['construction.boq']
+        draft_boq_count = 0
         if has_boq:
             Boq = self.env['construction.boq']
             boq_domain = [('project_id', '=', project_id)] if project_id else []
-            boqs = Boq.search(boq_domain, order='id desc')
+            all_boqs = Boq.search(boq_domain, order='id desc')
+            draft_boq_count = len(all_boqs.filtered(lambda b: b.state == 'draft'))
+            boqs = all_boqs.filtered(lambda b: b.state != 'draft') or all_boqs
 
         delayed_list = []
         seen_proj_ids = set()
@@ -321,6 +330,7 @@ class ConstructionDashboardService(models.AbstractModel):
             'projects': {
                 'total_count': len(target_projects),
                 'boq_count': len(boqs),
+                'draft_boq_count': draft_boq_count,
                 'avg_progress_planned': avg_progress_planned,
                 'avg_progress_actual': avg_progress_actual,
                 'delayed_count': len(delayed_list),
