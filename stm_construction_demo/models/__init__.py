@@ -11,3 +11,4 @@ from . import real_estate_inherit
 from . import online_booking
 from . import dashboard_service
 # === S4 ===
+from . import demo_loader

@@ -49,6 +49,7 @@
         'views/online_booking_views.xml',
         'views/dashboard_views.xml',
         # === S4 ===
+        'views/demo_loader_views.xml',
     ],
     'assets': {
         'web.assets_backend': [

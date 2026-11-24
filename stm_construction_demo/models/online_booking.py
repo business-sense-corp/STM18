@@ -159,7 +159,7 @@ class ConstructionOnlineBooking(models.Model):
             if rec.sale_order_id:
                 raise UserError(_('تم إنشاء أمر بيع مسبقاً لهذا الحجز.'))
 
-            tmpl = rec.product_id.product_tmpl_id
+            tmpl = rec.product_id.product_tmpl_id.sudo()
             tmpl.write({
                 'stm_is_real_estate_unit': True,
                 'stm_unit_availability': 'reserved',
@@ -219,7 +219,7 @@ class ConstructionOnlineBooking(models.Model):
         for rec in self:
             if not rec.rejection_reason:
                 raise UserError(_('يرجى كتابة سبب رفض الحجز قبل المتابعة.'))
-            tmpl = rec.product_id.product_tmpl_id
+            tmpl = rec.product_id.product_tmpl_id.sudo()
             if tmpl.stm_unit_availability == 'reserved':
                 tmpl.stm_unit_availability = 'available'
             rec.write({

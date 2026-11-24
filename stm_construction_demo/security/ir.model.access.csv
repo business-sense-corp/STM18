@@ -29,3 +29,6 @@ access_construction_unit_cost_finance,construction.unit.cost.finance,model_const
 access_construction_kpi_config_site_eng,construction.kpi.config.site_eng,model_construction_kpi_config,group_stm_site_engineer,1,0,0,0
 access_construction_kpi_config_pm,construction.kpi.config.pm,model_construction_kpi_config,group_stm_project_manager,1,1,1,1
 access_construction_kpi_config_finance,construction.kpi.config.finance,model_construction_kpi_config,group_stm_sales_finance,1,1,1,1
+access_stm_demo_loader_site_eng,stm.demo.loader.site_eng,model_stm_demo_loader,group_stm_site_engineer,1,0,0,0
+access_stm_demo_loader_pm,stm.demo.loader.pm,model_stm_demo_loader,group_stm_project_manager,1,1,1,1
+access_stm_demo_loader_finance,stm.demo.loader.finance,model_stm_demo_loader,group_stm_sales_finance,1,1,1,1

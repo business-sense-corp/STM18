@@ -76,12 +76,14 @@
                             string="إنشاء مسودة فاتورة مورد"
                             class="btn-primary"
                             icon="fa-file-text-o"
+                            groups="stm_construction_demo.group_stm_sales_finance"
                             invisible="certificate_type != 'vendor' or state not in ('pm_approved', 'accounting', 'paid') or move_id"/>
                     <button name="action_create_account_move"
                             type="object"
                             string="إنشاء مسودة فاتورة عميل"
                             class="btn-primary"
                             icon="fa-file-text-o"
+                            groups="stm_construction_demo.group_stm_sales_finance"
                             invisible="certificate_type != 'customer' or state not in ('pm_approved', 'accounting', 'paid') or move_id"/>
                     <button name="action_mark_paid"
                             type="object"

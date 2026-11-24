@@ -123,7 +123,7 @@ class RealEstateContract(models.Model):
         for rec in self:
             rec.stm_handover_status = 'ready'
             if rec.product_id and rec.product_id.product_tmpl_id.stm_handover_readiness == 'under_construction':
-                rec.product_id.product_tmpl_id.stm_handover_readiness = 'ready'
+                rec.product_id.product_tmpl_id.sudo().stm_handover_readiness = 'ready'
 
     def action_stm_handover_approve(self):
         for rec in self:
@@ -140,7 +140,7 @@ class RealEstateContract(models.Model):
                 'stm_actual_handover_date': today,
             })
             if rec.product_id:
-                rec.product_id.product_tmpl_id.write({
+                rec.product_id.product_tmpl_id.sudo().write({
                     'stm_handover_readiness': 'handed_over',
                     'stm_unit_availability': 'sold',
                 })
